@@ -1,10 +1,12 @@
-import http = require('http')
-import https = require('https')
+import * as http from 'http'
+import * as https from'https'
 import { Activity, Agent, Artefact, TrNode, Trace } from './models';
 
-import ParserJsonld from '@rdfjs/parser-jsonld';
 import { Readable, Stream } from 'stream';
 import { Tool } from './models';
+
+import * as jsonld from 'jsonld'
+import * as N3 from 'n3'
 
 
 
@@ -74,7 +76,7 @@ class TraceabilityAPIClient {
                             input.push(rawData)
                         }
                     })
-                    let output = this.parseObjects(input)
+                    let output = this.parseObjects(rawData)
                     callback(output)
 
                     //const parsed = JSON.parse(rawData)
@@ -87,7 +89,9 @@ class TraceabilityAPIClient {
     }
 
 
-    parseObjects = (data: Stream) => {
+    parseObjects = async (data: string) => {
+        const parser = new N3.Parser()
+
         let nodes: Array<TrNode> = []
         let traces: Array<Trace> = []
 
@@ -103,12 +107,39 @@ class TraceabilityAPIClient {
             "http://www.w3.org/ns/prov#actedOnBehalfOf",
         ]
 
-        const parserJsonld = new ParserJsonld()
-        const output = parserJsonld.import(data)
-
         type T1 = {[predicate: string]: string}
         type T2 = {[uri: string]: T1}
         let rdfNodes: T2 = {}
+
+        let nquads = await jsonld.toRDF(JSON.parse(data))
+        Object.values(nquads).forEach(quad => {
+            let subj = this.applyContext(quad.subject.value)
+            let pred = this.applyContext(quad.predicate.value)
+            let obje = this.applyContext(quad.object.value)
+
+            // Sort the returned RDF quads into traces and node parameters
+
+            if (quad.predicate.value in tracePredicates) {
+                traces.push(new Trace(
+                    subj,
+                    pred,
+                    obje
+                ))
+                return;
+            }
+
+            if (!(subj in rdfNodes)) {
+                rdfNodes[subj] = {}
+            }
+            rdfNodes[subj][pred] = obje
+        })
+        
+
+
+        /*
+        const parserJsonld = new ParserJsonld()
+        const output = parserJsonld.import(data)
+
 
         output.on('data', quad => {
             let subj = this.applyContext(quad.subject.value)
@@ -131,6 +162,7 @@ class TraceabilityAPIClient {
             }
             rdfNodes[subj][pred] = obje
         })
+        */
 
         // Create node instances
         for (const [sid, kv] of Object.entries(rdfNodes)) {

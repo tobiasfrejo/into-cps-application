@@ -30,8 +30,8 @@
  */
 
 
-import fs = require("fs");
-import Path = require("path");
+import * as fs from 'fs';
+import * as Path from "path";
 import {RTTester} from "../rttester/RTTester";
 
 

@@ -33,14 +33,15 @@ import { IntoCpsApp } from "../IntoCpsApp"
 import { SettingKeys } from "../settings/SettingKeys";
 import { DialogHandler } from "../DialogHandler";
 
-import Path = require('path');
-import fs = require('fs');
+import * as Path from "path";
+import * as fs from 'fs';
 
-import downloader = require("../downloader/Downloader");
+import * as downloader from "../downloader/Downloader";
 
-const dialog = require("electron").remote.dialog;
+import * as electron from 'electron'
+const dialog = electron.remote.dialog;
 
-const BrowserWindow = require('electron').remote.BrowserWindow;
+const BrowserWindow = electron.remote.BrowserWindow;
 
 function scrollIntoView(eleID: any) {
     var e = document.getElementById(eleID);

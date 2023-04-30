@@ -30,8 +30,8 @@
  */
 
 import * as fs from 'fs';
-import Path = require("path");
-let JSZip = require("jszip");
+import * as Path from 'path';
+import * as JSZip from 'jszip';
 import { Utilities } from "../../../utilities"
 import { NgZone } from '@angular/core';
 import { reject } from 'bluebird';

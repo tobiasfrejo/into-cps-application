@@ -30,8 +30,8 @@
  */
 
 
-import fs = require("fs");
-import Path = require("path");
+import * as fs from 'fs';
+import * as Path from "path";
 
 export function display(dir: string): void {
     let hAddButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById("modalAdd");

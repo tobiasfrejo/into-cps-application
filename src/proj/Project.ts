@@ -33,8 +33,8 @@
  // See the CONTRIBUTORS file for author and contributor information. 
 
 
-import fs = require('fs');
-import Path = require('path');
+ import * as fs from 'fs';
+ import * as Path from "path";
 
 import { IProject } from "./IProject"
 import { ProjectSettings } from "./ProjectSettings"

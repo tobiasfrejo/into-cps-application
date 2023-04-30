@@ -30,7 +30,7 @@
  */
 
 import { IntoCpsApp } from "../IntoCpsApp";
-import Path = require("path");
+import * as Path from "path";
 import { SettingKeys } from "../settings/SettingKeys";
 import { Utilities } from "../utilities";
 

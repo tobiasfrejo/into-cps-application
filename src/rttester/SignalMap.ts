@@ -30,7 +30,7 @@
  */
 
 
-import fs = require("fs");
+import * as fs from 'fs';
 
 export class SignalMapEntry {
     lowerBound: number;

@@ -32,8 +32,8 @@
 
 import { ViewController } from "../iViewController";
 import { IntoCpsApp } from "../IntoCpsApp";
-import Path = require("path");
-import fs = require("fs");
+import * as Path from "path";
+import * as fs from 'fs';
 import { RTTester } from "../rttester/RTTester";
 import { Abstractions, Interface, Input } from "./CTAbstractions";
 import { Utilities } from "../utilities";

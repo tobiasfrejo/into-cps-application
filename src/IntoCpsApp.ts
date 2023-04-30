@@ -41,6 +41,7 @@ import { IntoCpsAppEvents } from "./IntoCpsAppEvents";
 import { SettingKeys } from "./settings//SettingKeys";
 import { Utilities } from "./utilities";
 import { CoeProcess } from "./coe-server-status/CoeProcess";
+import { TraceabilityController } from './traceability/TraceabilityController';
 
 const {remote} = require("electron");
 
@@ -54,6 +55,7 @@ let topBarNameId: string = "activeTabTitle";
     platform: String
     window: Electron.BrowserWindow;
     coeProcess: CoeProcess = null;
+    trController: TraceabilityController = null;
 
     settings: Settings;
 
@@ -95,6 +97,8 @@ let topBarNameId: string = "activeTabTitle";
             this.settings.setValue(SettingKeys.UPDATE_SITE, defaultValues[SettingKeys.UPDATE_SITE]);
             this.settings.setValue(SettingKeys.EXAMPLE_REPO, defaultValues[SettingKeys.EXAMPLE_REPO]);
         }
+
+        this.trController = new TraceabilityController()
     }
 
     public loadPreviousActiveProject(){

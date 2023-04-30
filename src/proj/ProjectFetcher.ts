@@ -40,8 +40,8 @@ import {IntoCpsApp} from  "../IntoCpsApp"
 import {SettingKeys} from "../settings/SettingKeys";
 
 
-import Path = require('path');
-import fs = require('fs');
+import * as fs from 'fs';
+import * as Path from "path";
 // dialog from main thread
 const { dialog } = require('electron');
 

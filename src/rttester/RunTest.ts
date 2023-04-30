@@ -34,7 +34,7 @@ import { ViewController } from "../iViewController";
 import { IntoCpsApp } from "../IntoCpsApp";
 import { RTTester } from "../rttester/RTTester";
 import * as RTesterModalCommandWindow from "./GenericModalCommand";
-import Path = require("path");
+import * as Path from "path";
 import { IntoCpsAppMenuHandler } from "../IntoCpsAppMenuHandler";
 const dialog = require("electron").remote.dialog;
 

@@ -34,7 +34,7 @@
 
 
 
-import Path = require("path");
+ import * as Path from "path";
 
 
 function gup(name: any, url: any) {

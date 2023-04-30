@@ -33,8 +33,8 @@ import {IntoCpsApp} from  "../IntoCpsApp"
 import {SettingKeys} from "../settings/SettingKeys";
 import * as ProjectFetcher from "../proj/ProjectFetcher"
 
-import * as Path from "path";
-import * as fs from 'fs';
+import Path = require('path');
+import fs = require('fs');
 
 import * as http from "http";
 let request = require("request");

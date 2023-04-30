@@ -34,7 +34,7 @@ import { SettingKeys } from "../settings/SettingKeys";
 const { remote, ipcRenderer } = require("electron");
 import * as Path from 'path';
 import * as child_process from 'child_process'
-import * as fs from 'fs';
+import fs = require('fs');
 import { CoeProcess } from "./CoeProcess"
 
 var globalChild: any;

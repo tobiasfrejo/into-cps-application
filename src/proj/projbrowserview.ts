@@ -37,7 +37,7 @@ import { IntoCpsApp } from "../IntoCpsApp";
 import { Project } from "./Project";
 import { isResultValid } from "../intocps-configurations/ResultConfig";
 import * as fs from 'fs';
-import * as Path from "path";
+import Path = require("path");
 const rimraf = require("rimraf");
 const { BrowserWindow } = require('electron');
 import { RTTester } from "../rttester/RTTester";

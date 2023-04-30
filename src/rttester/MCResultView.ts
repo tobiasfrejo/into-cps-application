@@ -32,9 +32,9 @@
 
 import { ViewController } from "../iViewController";
 import { IntoCpsApp } from "../IntoCpsApp";
+import Path = require("path");
 import { RTTester } from "../rttester/RTTester";
-import * as fs from 'fs';
-import * as Path from "path";
+import fs = require("fs");
 
 
 export class MCResultView extends ViewController {

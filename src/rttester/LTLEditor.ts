@@ -31,9 +31,9 @@
 
 import { ViewController } from "../iViewController";
 import { IntoCpsApp } from "../IntoCpsApp";
+import Path = require("path");
 import { RTTester } from "../rttester/RTTester";
-import * as fs from 'fs';
-import * as Path from "path";
+import fs = require("fs");
 import * as RTesterModalCommandWindow from "./GenericModalCommand";
 import { IntoCpsAppMenuHandler } from "../IntoCpsAppMenuHandler";
 

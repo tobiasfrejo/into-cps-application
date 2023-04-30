@@ -34,7 +34,7 @@ import { ViewController } from "../iViewController";
 import { IntoCpsApp } from "../IntoCpsApp";
 import { Abstractions, Interface, Input, Component, Abstraction } from "../rttester/CTAbstractions";
 import { SignalMap, SignalMapEntry } from "./SignalMap";
-import * as Path from "path";
+import Path = require("path");
 import { RTTester } from "../rttester/RTTester";
 const dialog = require("electron").remote.dialog;
 

@@ -74,7 +74,7 @@ import { AppModule } from "./angular2-app/app.module";
 import { TraceabilityViewController } from "./angular2-app/traceability/TraceabilityViewController";
 
 
-export default class InitializationController {
+class InitializationController {
     // constants
     mainViewId: string = "mainView";
     layout: W2UI.W2Layout;
@@ -510,3 +510,6 @@ menuHandler.showTraceView = () => {
 };
 
 menuHandler.exportOvertureFmu = Overture.exportOvertureFmu;
+
+
+export = InitializationController 

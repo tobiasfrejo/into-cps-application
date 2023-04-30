@@ -29,8 +29,8 @@
  * See the CONTRIBUTORS file for author and contributor information. 
  */
 
-import * as fs from 'fs';
-import * as path from "path";
+import fs = require("fs");
+import path = require("path");
 import {ISettingsValues} from "./ISettingsValues";
 import {SettingKeys} from "./SettingKeys";
 

@@ -30,8 +30,8 @@
  */
 
 
-import * as fs from 'fs';
-import * as Path from "path";
+import Path = require('path');
+import fs = require("fs");
 import {IntoCpsApp} from  "./IntoCpsApp"
 
 

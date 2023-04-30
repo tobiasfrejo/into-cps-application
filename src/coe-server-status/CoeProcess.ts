@@ -33,7 +33,7 @@ import { IntoCpsApp } from "../IntoCpsApp";
 import { SettingKeys } from "../settings/SettingKeys";
 import { ISettingsValues } from "../settings/ISettingsValues";
 import * as Path from "path";
-import * as fs from 'fs';
+import fs = require("fs");
 import * as child_process from "child_process";
 import { CoeLogPrinter } from "./../coeLogPrinter";
 import { UICrtlType } from "./../CoeServerStatusUiController";

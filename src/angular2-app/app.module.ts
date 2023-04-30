@@ -54,11 +54,25 @@ import { DseCoeLaunchComponent, SafePipe } from './dse/dse-coe-launch.component'
 import {SigverPageComponent} from "./sigver/sigver-page.component";
 import {SigverConfigurationComponent} from "./sigver/sigver-configuration.component";
 import {SigverCoeInteractionComponent} from "./sigver/sigver-coe-interaction.component";
+import { TraceabilityModule } from './traceability/traceability.module';
+import { TraceabilityPageComponent } from './traceability/traceability-page.component';
 
 @NgModule({
   imports: [ BrowserModule, HttpClientModule, FormsModule,
-     MmModule, COEModule, ReactiveFormsModule, SharedModule], // module dependencies
-  declarations: [AppComponent , SafePipe,  DsePageComponent, DseConfigurationComponent, DseCoeLaunchComponent, SigverPageComponent, SigverConfigurationComponent, SigverCoeInteractionComponent], // components and directives
+     MmModule, COEModule, ReactiveFormsModule, SharedModule,
+     TraceabilityModule
+    ], // module dependencies
+  declarations: [
+    AppComponent, 
+    SafePipe,  
+    DsePageComponent, 
+    DseConfigurationComponent, 
+    DseCoeLaunchComponent, 
+    SigverPageComponent, 
+    SigverConfigurationComponent, 
+    SigverCoeInteractionComponent,
+    TraceabilityPageComponent
+  ], // components and directives
   bootstrap: [AppComponent], // root component
   providers: [FileSystemService, SettingsService, NavigationService], // services
   exports: []

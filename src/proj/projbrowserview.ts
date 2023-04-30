@@ -699,15 +699,18 @@ export class BrowserController {
                 result.menuEntries = [menuEntryCreate];
             }
             else if (Path.basename(path) == Project.PATH_TRACEABILITY) {
+                /*
                 let menuGraph = menuEntry("View Traceability Graph", "glyphicon glyphicon-asterisk",
                     function (item: ProjectBrowserItem) {
                         self.menuHandler.showTraceView();
                     });
+                */
                 let menuOpenTr = menuEntry("Trace Objects", "glyphicon glyphicon-asterisk",
                     function (item: ProjectBrowserItem) {
+                        console.log("Opening Traceability")
                         self.menuHandler.openTraceability();
                     });
-                result.menuEntries = [menuGraph, menuOpenTr];
+                result.menuEntries = [/*menuGraph,*/ menuOpenTr];
                 result.clickHandler = function (item: ProjectBrowserItem) {
                     self.menuHandler.openTraceability();
 

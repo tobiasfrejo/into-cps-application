@@ -71,6 +71,7 @@ import { enableProdMode } from '@angular/core';
 
 import { CoeServerStatusUiController,CoeLogUiController } from "./CoeServerStatusUiController"
 import { AppModule } from "./angular2-app/app.module";
+import { TraceabilityViewController } from "./angular2-app/traceability/TraceabilityViewController";
 
 
 class InitializationController {
@@ -196,6 +197,7 @@ let init = new InitializationController();
 let controller: IViewController;
 let coeViewController: CoeServerStatusUiController = null;
 let coeLogViewController: CoeLogUiController=null;
+let traceabilityViewController: TraceabilityViewController=null;
 
 function closeView(): boolean {
     if (controller && controller.deInitialize) {
@@ -262,6 +264,10 @@ menuHandler.openSigverView = (path: string) => {
 menuHandler.openDseView = (path: string) => {
     openView(null, view => new DseViewController(view, path));
 };
+
+menuHandler.openTraceability = () => {
+    openView(null, view => new TraceabilityViewController(view))
+}
 
 menuHandler.runRTTesterCommand = (commandSpec: any) => {
     RTesterModalCommandWindow.runCommand(commandSpec);

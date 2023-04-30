@@ -18,7 +18,11 @@ class TraceabilityAPIClient {
     sendGet = (path:string) => {
         let url = new URL(path, this.baseUrl)
         httpX(url)
-            .get(url.href, this.handleResponse())
+            .get(url.href, this.handleResponse(
+                (data) => {
+                    console.log(data)
+                }
+            ))
             .on('error', e => {
                 console.error(`Got error: ${e.message}`)
             })
@@ -26,7 +30,7 @@ class TraceabilityAPIClient {
 
 
     // Based on the example from the node docs: https://nodejs.org/docs/latest-v14.x/api/http.html#http_http_get_url_options_callback
-    handleResponse = (callback: (data: Object) => (res: http.IncomingMessage) => void = undefined) => {
+    handleResponse = (callback: (data: Object) => void = undefined) => {
         return (res: http.IncomingMessage) => {
             const {statusCode} = res;
             const contentType = res.headers['content-type'];

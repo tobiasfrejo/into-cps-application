@@ -76,6 +76,7 @@ class Entity extends TrNode {
     constructor (uri: string, type: string) {
         super(uri)
         this.specifier = "prov:Entity"
+        this.type = type
     }
 
     getParameters() {
@@ -89,6 +90,12 @@ class Entity extends TrNode {
 class Artefact extends Entity {
     path: string
     hash: string
+
+    constructor (uri: string, type: string, path: string, hash: string) {
+        super(uri, type)
+        this.path = path
+        this.hash = hash
+    }
 
     getParameters() {
         return {

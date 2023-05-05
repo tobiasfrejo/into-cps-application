@@ -1,4 +1,5 @@
 import { GitConnector } from "./git-connector";
+import IntoCpsApp from "../IntoCpsApp";
 
 class Trace {
     subject: string
@@ -15,13 +16,23 @@ class Trace {
 class TrNode {
     uri: string
     specifier: string
+    projectId: string
 
     constructor (uri: string) {
         this.uri = uri
     }
 
+    setProjectId(id: string = null) {
+        if (id === null)
+            this.projectId = IntoCpsApp.getInstance().activeProject.getId()
+        else
+            this.projectId = id
+    }
+
     getParameters() {
-        let p: {[key: string]: string} = {}
+        let p: {[key: string]: string} = {
+            projectId: this.projectId
+        }
         return p
     }
 }

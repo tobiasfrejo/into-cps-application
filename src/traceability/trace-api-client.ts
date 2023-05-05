@@ -7,12 +7,13 @@ import { Tool } from './models';
 
 import * as jsonld from 'jsonld'
 import * as N3 from 'n3'
+import IntoCpsApp from '../IntoCpsApp';
 
 
 
 // Return the corresponding module based on URL
 let httpX = (url:URL) => {
-    console.log(`Getting proto for url ${url.href}: ${url.protocol}`)
+    //console.log(`Getting proto for url ${url.href}: ${url.protocol}`)
     if (url.protocol === 'https:')
         return https;
     else return http
@@ -56,6 +57,7 @@ class TraceabilityAPIClient {
         return (res: http.IncomingMessage) => {
             const {statusCode} = res;
             const contentType = res.headers['content-type'];
+            console.log(statusCode, contentType)
             
             let error;
             if (statusCode != 200) {
@@ -218,6 +220,16 @@ class TraceabilityAPIClient {
         return val
     }
 
+    getSimulations() {
+        let params = {
+            "projectId": IntoCpsApp.getInstance().activeProject.getId(),
+            "intocps:ActivityType": "intocps:Simulation"
+        }
+
+        return this.sendGet("nodes", params)
+    }
+
+        
 }
 
 export {TraceabilityAPIClient}

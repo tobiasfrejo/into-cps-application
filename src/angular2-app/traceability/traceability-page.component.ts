@@ -18,6 +18,20 @@ export class TraceabilityPageComponent {
         this.TrController = IntoCpsApp.getInstance().trController
     }
 
+    getSimulations() {
+        console.log("Testing...")
+        this.loading = true
+        this.TrController.client.getSimulations()
+        .then((rd: Object) => {
+            if ('nodes' in rd)
+                this.nodes = Object.values(rd['nodes'])
+        })
+        .finally(() => {
+            this.loading = false
+        })
+
+    }
+
     getNodes = () => {
         this.loading = true
         this.TrController.client.sendGet('nodes')

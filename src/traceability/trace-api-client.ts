@@ -133,36 +133,6 @@ class TraceabilityAPIClient {
             }
             rdfNodes[subj][pred] = obje
         })
-        
-
-
-        /*
-        const parserJsonld = new ParserJsonld()
-        const output = parserJsonld.import(data)
-
-
-        output.on('data', quad => {
-            let subj = this.applyContext(quad.subject.value)
-            let pred = this.applyContext(quad.predicate.value)
-            let obje = this.applyContext(quad.object.value)
-
-            // Sort the returned RDF quads into traces and node parameters
-
-            if (quad.predicate.value in tracePredicates) {
-                traces.push(new Trace(
-                    subj,
-                    pred,
-                    obje
-                ))
-                return;
-            }
-
-            if (!(subj in rdfNodes)) {
-                rdfNodes[subj] = {}
-            }
-            rdfNodes[subj][pred] = obje
-        })
-        */
 
         // Create node instances
         for (const [sid, kv] of Object.entries(rdfNodes)) {

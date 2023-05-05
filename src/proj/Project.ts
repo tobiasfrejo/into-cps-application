@@ -41,10 +41,12 @@ import { ProjectSettings } from "./ProjectSettings"
 import { DseConfiguration } from "../intocps-configurations/dse-configuration"
 import { IntoCpsApp } from "../IntoCpsApp";
 import { SettingKeys } from "../settings/SettingKeys";
+import { randomUUID } from 'crypto';
 
 export class Project implements IProject {
 
     name: string;
+    projectId: string;
     rootPath: string;
     configPath: string;
     /**
@@ -86,6 +88,10 @@ export class Project implements IProject {
         return Project.PATH_SYSML;
     }
 
+    public generateId() {
+        this.projectId = randomUUID()
+    }
+
     //TODO: replace with proper folder struct
     public save() {
 
@@ -105,6 +111,8 @@ export class Project implements IProject {
             }
             //create empty ignore file for folder
         }
+
+        if (!this.projectId) this.generateId();
 
         fs.open(this.configPath, "w", (err, fd) => {
             if (err) {

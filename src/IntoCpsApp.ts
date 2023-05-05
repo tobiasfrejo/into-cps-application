@@ -205,6 +205,7 @@ let topBarNameId: string = "activeTabTitle";
 
     public createProject(name: string, path: string) {
         let project = new Project(name, path, Path.normalize(path + "/.project.json"));
+        project.generateId()
         project.save();
         this.setActiveProject(project);
      }

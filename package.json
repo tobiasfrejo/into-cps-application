@@ -114,7 +114,7 @@
     "@types/bunyan": "0.0.35",
     "@types/jsonld": "^1.5.8",
     "@types/n3": "^1.10.0",
-    "@types/node": "^14.18.44",
+    "@types/node": "^14.14.45",
     "@types/rdfjs__parser-jsonld": "^2.1.0",
     "@types/request": "^2.48.8",
     "@types/xml2js": "0.0.32",

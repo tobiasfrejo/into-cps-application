@@ -108,7 +108,7 @@ export default class Settings implements ISettingsValues {
       }
 
       // Reads settings.json from user's computer
-      this.intoCpsDataObject = JSON.parse(fs.readFileSync(this.settingsFile, "UTF-8"));
+      this.intoCpsDataObject = JSON.parse(fs.readFileSync(this.settingsFile, "utf-8"));
       
       // To remove after migration into-cps project to into-cps-association is complete
       this.migrateToAssociation();

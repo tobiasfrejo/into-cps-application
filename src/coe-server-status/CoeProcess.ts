@@ -230,7 +230,7 @@ export class CoeProcess {
     this.process = child;
 
     console.info("Starting COE process pid = " + child.pid);
-    fs.writeFile(this.getPidFilePath(), child.pid, function(err) {
+    fs.writeFile(this.getPidFilePath(), child.pid.toString(), function(err) {
       if (err) {
         throw err;
       }

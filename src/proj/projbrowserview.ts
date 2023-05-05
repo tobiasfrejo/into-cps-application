@@ -753,7 +753,7 @@ export class BrowserController {
 
         try {
             if (fs.accessSync(projectFile, fs.constants.R_OK) !== null) {
-                let content = fs.readFileSync(projectFile, "UTF-8");
+                let content = fs.readFileSync(projectFile, "utf-8");
                 return content.indexOf("org.overture.ide.vdmrt.core.nature") >= 0;
 
             }

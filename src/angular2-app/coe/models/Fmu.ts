@@ -117,7 +117,7 @@ export class Fmu {
 
         return checkFileExists.then(() => {
             return fileReadPromise.then(data => {
-                self.populateFromModelDescription(data.toString('UTF-8', 0, data.length));
+                self.populateFromModelDescription(data.toString('utf-8', 0, data.length));
             });
         }).catch(error => console.error("Error when popilating from model description: " + error));
     }

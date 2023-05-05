@@ -45,7 +45,7 @@ export class CoeLogPrinter {
     private interval: number = 1000;
     private filePosition: number = 0;
     private intervalIsRunning : boolean = false;
-    private intervalHandle : number;
+    private intervalHandle : NodeJS.Timeout;
     private printingRemainingIsActive: boolean = false;
 
     constructor(maxFileReadSize: number, callback: (data: string) => void) {

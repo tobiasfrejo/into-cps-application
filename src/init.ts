@@ -338,7 +338,7 @@ menuHandler.createMultiModel = (path, msgTitle = 'New Multi-Model') => {
             height: 200,
             callBack: function (value: String) {
 
-                let content = fs.readFileSync(path, "UTF-8");
+                let content = fs.readFileSync(path, "utf-8");
                 try {
                     if (!value) { return; }
                     mmPath = <string>project.createMultiModel(value, content);
@@ -359,7 +359,7 @@ menuHandler.createSysMLDSEConfig = (path) => {
 
     if (project) {
         let name = Path.basename(path, ".sysml-dse.json");
-        let content = fs.readFileSync(path, "UTF-8");
+        let content = fs.readFileSync(path, "utf-8");
         let dsePath = <string>project.createSysMLDSEConfig(`dse-${name}-${Math.floor(Math.random() * 100)}`, content);
         menuHandler.openDseView(dsePath);
     }

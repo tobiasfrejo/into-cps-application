@@ -60,7 +60,7 @@ export class Project implements IProject {
     static PATH_MULTI_MODELS: string = "Multi-models";
     static PATH_DSE: string = "DSEs";
     static PATH_SIGVER: string = "Sigver";
-    //PATH_CONNECTIONS: String = "SysML Connections";
+    //PATH_CONNECTIONS: string = "SysML Connections";
     static PATH_SYSML: string = "SysML";
     static PATH_TEST_DATA_GENERATION: string = "Test-Data-Generation";
     static PATH_TRACEABILITY: string = "Traceability";
@@ -84,7 +84,7 @@ export class Project implements IProject {
     public getProjectConfigFilePath(): string { return this.configPath }
     public getFmusPath(): string { return Path.normalize(this.getRootFilePath() + "/" + this.PATH_FMUS); }
 
-    public getSysMlFolderName(): String {
+    public getSysMlFolderName(): string {
         return Project.PATH_SYSML;
     }
 
@@ -151,7 +151,7 @@ export class Project implements IProject {
            }*/
     }
 
-    public createMultiModel(name: String, jsonContent: String): String {
+    public createMultiModel(name: string, jsonContent: string): string {
         let path = Path.normalize(this.rootPath + "/" + Project.PATH_MULTI_MODELS + "/" + name);
 
         if (fs.existsSync(path)) throw new Error('Multi-Model ' + name + ' already exists!');
@@ -160,24 +160,24 @@ export class Project implements IProject {
 
         let fullpath = Path.normalize(path + "/mm.json");
 
-        fs.writeFileSync(fullpath, jsonContent == null ? "{}" : jsonContent, "UTF-8");
+        fs.writeFileSync(fullpath, jsonContent == null ? "{}" : jsonContent, "utf-8");
 
         return fullpath;
     }
 
-    public createSysMLDSEConfig(name: String, jsonContent: String): String {
+    public createSysMLDSEConfig(name: string, jsonContent: string): string {
         let path = Path.normalize(this.rootPath + "/" + Project.PATH_DSE + "/" + name);
 
         fs.mkdirSync(path);
 
         let fullpath = Path.normalize(path + "/" + name + ".dse.json");
 
-        fs.writeFileSync(fullpath, jsonContent == null ? "{}" : jsonContent, "UTF-8");
+        fs.writeFileSync(fullpath, jsonContent == null ? "{}" : jsonContent, "utf-8");
 
         return fullpath;
     }
 
-    public createSigVer(name: String): String {
+    public createSigVer(name: string): string {
         let path = Path.normalize(this.rootPath + "/" + Project.PATH_SIGVER + "/" + name);
 
         if (fs.existsSync(path)) throw new Error('Configuration ' + name + ' already exists!');
@@ -186,24 +186,24 @@ export class Project implements IProject {
 
         let fullpath = Path.normalize(path + "/" + name + ".sigverConfig.json");
 
-        fs.writeFileSync(fullpath, "{}", "UTF-8");
+        fs.writeFileSync(fullpath, "{}", "utf-8");
 
         return fullpath;
     }
 
-    public createDse(name: String, jsonContent: String): String {
+    public createDse(name: string, jsonContent: string): string {
         let path = Path.normalize(this.rootPath + "/" + Project.PATH_DSE + "/" + name);
 
         fs.mkdirSync(path);
 
         let fullpath = Path.normalize(path + "/" + name + ".dse.json");
 
-        fs.writeFileSync(fullpath, jsonContent, "UTF-8");
+        fs.writeFileSync(fullpath, jsonContent, "utf-8");
 
         return fullpath;
     }
 
-    public createCoSimConfig(multimodelConfigPath: string, name: String, jsonContent: String): string {
+    public createCoSimConfig(multimodelConfigPath: string, name: string, jsonContent: string): string {
         let mmDir = Path.dirname(multimodelConfigPath);
         let path = Path.normalize(mmDir + "/" + name);
 
@@ -218,7 +218,7 @@ export class Project implements IProject {
 
         data = JSON.stringify(json);
         console.info(data);
-        fs.writeFileSync(fullpath, data, "UTF-8");
+        fs.writeFileSync(fullpath, data, "utf-8");
 
         return fullpath;
     }

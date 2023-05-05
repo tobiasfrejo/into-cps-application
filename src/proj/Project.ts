@@ -41,7 +41,7 @@ import { ProjectSettings } from "./ProjectSettings"
 import { DseConfiguration } from "../intocps-configurations/dse-configuration"
 import { IntoCpsApp } from "../IntoCpsApp";
 import { SettingKeys } from "../settings/SettingKeys";
-import { randomUUID } from 'crypto';
+import crypto = require("crypto");
 
 export class Project implements IProject {
 
@@ -89,7 +89,8 @@ export class Project implements IProject {
     }
 
     public generateId() {
-        this.projectId = randomUUID()
+        this.projectId = crypto.randomBytes(16).toString('hex')
+        console.log(`Generated project ID ${this.projectId}`)
     }
 
     //TODO: replace with proper folder struct

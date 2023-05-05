@@ -24,13 +24,17 @@ class TraceabilityAPIClient {
         this.baseUrl = url
     }
 
-    sendGet = (path:string) => {
+    sendGet = (path:string, parameters:object=null) => {
         let url = new URL(path, this.baseUrl)
         let options = {
             headers: {
                 "Accept": "application/ld+json, application/json"
             }
         }
+
+        if (parameters != null)
+            for (const [key, value] of Object.entries(parameters))
+                url.searchParams.append(key, value)
         
         console.log(`Sending GET to ${url.href}`)
 

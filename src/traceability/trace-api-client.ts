@@ -185,8 +185,10 @@ class TraceabilityAPIClient {
                         break;
 
                     case 'prov:Entity':
-                        if (!('intocps:EntityType' in kv))
-                            throw new Error("Improper Entity: " + sid)
+                        if (!('intocps:EntityType' in kv)) {
+                            console.error("Improper Entity: " + sid)
+                            console.debug(JSON.stringify(kv, null, 2))
+                        }
 
                         else if (kv['intocps:EntityType'] === 'intocps:Tool')
                             nodes.push(new Tool(
@@ -222,7 +224,7 @@ class TraceabilityAPIClient {
             "hash": "https://schema.org/sha256",
             "time": "https://schema.org/DateTime",
             "type": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "path": "http://ns.into-cps.org/Path",
+            "path": "http://into-cps.org/ns#Path",
         }
         const prefixes: {[key: string]: string} = {
             "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",

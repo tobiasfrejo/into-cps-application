@@ -1,3 +1,18 @@
 <div>
     <p>Hello World!</p>
+    <button type="button" (click)="getNodes()" class="btn btn-default btn-xs">
+        <span class="glyphicon glyphicon-plus"></span>
+    </button>
+    <div *ngIf="loading; then loadblock else displayblock"></div>
+    <ng-template #loadblock>Loading...</ng-template>
+    <ng-template #displayblock>
+        <div *ngFor="let node of nodes">
+            <a>{{node.uri}}</a>
+            <br>
+            <div *ngFor="let item of node | keyvalue">
+                <span>{{item.key}}</span>: <span>{{item.value}}</span>
+            </div>
+            <br/>
+        </div>
+    </ng-template>
 </div>

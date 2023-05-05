@@ -113,7 +113,7 @@
     "@types/bluebird": "~3.0.37",
     "@types/bunyan": "0.0.35",
     "@types/jsonld": "^1.5.8",
-    "@types/n3": "^1.10.4",
+    "@types/n3": "^1.10.0",
     "@types/node": "^13.13.52",
     "@types/rdfjs__parser-jsonld": "^2.1.0",
     "@types/request": "^2.48.8",

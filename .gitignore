@@ -56,3 +56,8 @@ pkg/
 
 # WebStorm project files
 .idea/
+
+
+
+test/TestData/
+!test/TestData/*.zip

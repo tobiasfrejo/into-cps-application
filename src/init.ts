@@ -336,7 +336,7 @@ menuHandler.createMultiModel = (path, msgTitle = 'New Multi-Model') => {
             cancel_text: 'Cancel',
             width: 500,
             height: 200,
-            callBack: function (value: String) {
+            callBack: function (value: string) {
 
                 let content = fs.readFileSync(path, "utf-8");
                 try {
@@ -390,7 +390,7 @@ menuHandler.createSigverPlain = (msgTitle: string = 'Create New Configuration') 
             cancel_text: 'Cancel',
             width: 500,
             height: 200,
-            callBack: function (value: String) {
+            callBack: function (value: string) {
                 try {
                     if (!value) { return; }
                     menuHandler.openSigverView(<string>project.createSigVer(value));
@@ -417,7 +417,7 @@ menuHandler.createMultiModelPlain = (titleMsg: string = 'New Multi-Model') => {
             cancel_text: 'Cancel',
             width: 500,
             height: 200,
-            callBack: function (value: String) {
+            callBack: function (value: string) {
                 try {
                     if (!value) { return; }
                     let mmPath = <string>project.createMultiModel(value, "{}");
@@ -452,7 +452,7 @@ menuHandler.createCoSimConfiguration = (path) => {
             cancel_text: 'Cancel',
             width: 500,
             height: 200,
-            callBack: function (value: String) {
+            callBack: function (value: string) {
                 try {
                     if (!value) { return; }
 

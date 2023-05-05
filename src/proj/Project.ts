@@ -79,6 +79,10 @@ export class Project implements IProject {
         return this.name;
     }
 
+    public getId(): string {
+        return this.projectId;
+    }
+
 
     public getRootFilePath(): string { return this.rootPath; }
     public getProjectConfigFilePath(): string { return this.configPath }

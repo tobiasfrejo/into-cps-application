@@ -39,17 +39,20 @@ export interface IProject {
     getRootFilePath(): string;
     getProjectConfigFilePath(): string;
     getFmusPath(): string;
-    getSysMlFolderName(): String;
+    getSysMlFolderName(): string;
     save():void;
 
-    createMultiModel(name: String, jsonContent: String): String;
-    createDse(name: String, jsonContent: String): String;
-    createSigVer(name: String): String;
-    createSysMLDSEConfig(name: String, jsonContent: String): String;
-    createCoSimConfig(multimodelConfigPath: string, name: String, jsonContent: String): string;
+    getId(): string
+    generateId(): void
+
+    createMultiModel(name: string, jsonContent: string): string;
+    createDse(name: string, jsonContent: string): string;
+    createSigVer(name: string): string;
+    createSysMLDSEConfig(name: string, jsonContent: string): string;
+    createCoSimConfig(multimodelConfigPath: string, name: string, jsonContent: string): string;
 
     getSettings(): ProjectSettings;
 
-    freshMultiModelName(name : String): String;
+    freshMultiModelName(name : string): string;
     freshFilename(path: string, name: string) : string
 }

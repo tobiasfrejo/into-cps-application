@@ -1,18 +1,27 @@
 <div>
-    <p>Hello World!</p>
-    <button type="button" (click)="getSimulations()" class="btn btn-default btn-xs">
-        <span class="glyphicon glyphicon-plus"></span>
-    </button>
+    <div class="tr-header">
+        <p>
+            Load simulations
+        </p>
+        
+        <button type="button" (click)="getSimulations()" class="btn btn-default btn-xs">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+    </div>
+
     <div *ngIf="loading; then loadblock else displayblock"></div>
     <ng-template #loadblock>Loading...</ng-template>
     <ng-template #displayblock>
-        <div *ngFor="let node of nodes">
-            <a>{{node.uri}}</a>
-            <br>
-            <div *ngFor="let item of node | keyvalue">
-                <span>{{item.key}}</span>: <span>{{item.value}}</span>
-            </div>
-            <br/>
+        <div *ngFor="let nd of nodes">
+            <tr-sim [node]="nd"></tr-sim>
         </div>
     </ng-template>
+
+
+    <div class="tr-post-test">
+        <p>Test post</p>
+        <button type="button" (click)="testPost()" class="btn btn-default btn-xs">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+    </div>
 </div>

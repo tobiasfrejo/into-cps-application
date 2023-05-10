@@ -14,11 +14,14 @@ class Trace {
 }
 
 class TrNode {
+    className: string
+
     uri: string
     specifier: string
     projectId: string
 
     constructor (uri: string) {
+        this.className = "TrNode"
         this.uri = uri
     }
 
@@ -42,6 +45,7 @@ class Agent extends TrNode {
     email: string
     constructor (uri: string, name: string=undefined, email: string=undefined) {
         super(uri)
+        this.className = "Agent"
         this.specifier = "prov:Agent"
         this.name = name
         this.email = email
@@ -68,6 +72,7 @@ class Activity extends TrNode {
     time: Date
     constructor (uri: string, type: string, time: Date) {
         super(uri)
+        this.className = "Activity"
         this.specifier = "prov:Activity"
         this.type = type
         this.time = time
@@ -86,6 +91,7 @@ class Entity extends TrNode {
     type: string
     constructor (uri: string, type: string) {
         super(uri)
+        this.className = "Entity"
         this.specifier = "prov:Entity"
         this.type = type
     }
@@ -104,6 +110,7 @@ class Artefact extends Entity {
 
     constructor (uri: string, type: string, path: string, hash: string) {
         super(uri, type)
+        this.className = "Artefact"
         this.path = path
         this.hash = hash
     }
@@ -123,6 +130,7 @@ class Tool extends Entity {
 
     constructor(uri:string, type:string, name:string, version:string) {
         super(uri, type)
+        this.className = "Tool"
         this.name = name
         this.version = version
     }

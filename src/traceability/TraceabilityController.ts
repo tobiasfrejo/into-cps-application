@@ -8,15 +8,5 @@ export class TraceabilityController {
 
     constructor () {
         this.client = new TraceabilityAPIClient("http://localhost:8080/v2/")
-
-        this.get()
-    }
-
-    get() {
-        this.client.sendGet("nodes")
-        .then(data => {
-            console.log("Received: ", JSON.stringify(data, null, 2))
-            this.receivedData = data
-        })
     }
 }

@@ -88,3 +88,25 @@ coe-configuration .alert-big {
     vertical-align: 0.1em;
     }
     
+
+    
+.tr-header {
+    background-color: #fafafa;
+    width: 100%;
+    padding: 10pt;
+    margin-bottom: 10pt;
+}
+
+.sim {
+    background-color: #ffeeff;
+    width: calc(100% - 20pt);
+    padding: 10pt;
+    margin: 10pt;
+}
+
+.tr-post-test {
+    background-color: #ddeeff;
+    width: 100%;
+    padding: 10pt;
+    margin-top: 10pt;
+}

@@ -1,0 +1,19 @@
+<div class="sim">
+    <div>
+        <a>{{node.uri}}</a>
+        <p>{{node.type}}</p>
+        <p>{{node.time}}</p>
+    </div>
+    
+    <button type="button" (click)="getFmus()" class="btn btn-default btn-xs">
+        <span class="glyphicon glyphicon-plus"></span>
+    </button>
+    
+    <div *ngIf="loading; then loadblock else displayblock"></div>
+    <ng-template #loadblock>Loading...</ng-template>
+    <ng-template #displayblock>
+        <div *ngFor="let nd of result">
+            <div>{{nd.uri}}, {{nd.type}}</div>
+        </div>
+    </ng-template>
+</div>

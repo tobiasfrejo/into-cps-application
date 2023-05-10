@@ -70,8 +70,7 @@ import { TraceabilityPageComponent } from './traceability/traceability-page.comp
     DseCoeLaunchComponent, 
     SigverPageComponent, 
     SigverConfigurationComponent, 
-    SigverCoeInteractionComponent,
-    TraceabilityPageComponent
+    SigverCoeInteractionComponent
   ], // components and directives
   bootstrap: [AppComponent], // root component
   providers: [FileSystemService, SettingsService, NavigationService], // services

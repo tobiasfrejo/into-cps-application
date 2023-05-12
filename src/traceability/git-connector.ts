@@ -1,30 +1,49 @@
 import {IntoCpsApp} from './../IntoCpsApp';
 import { execSync } from 'child_process';
+import { Agent } from './models';
+import * as fs from 'fs'
+import * as path from 'path'
+import { pathExistsSync } from 'fs-extra';
 
 class GitUser {
-    username: string
+    name: string
     email: string
-    constructor(username: string, email: string) {
+    constructor(name: string, email: string) {
         this.email = email
-        this.username = username
+        this.name = name
     }
 }
 
 class GitConnector {
-    appInstance: IntoCpsApp;
-
-    constructor() {
-        this.appInstance = IntoCpsApp.getInstance()
+    static execProjectCmd = (cmd: string) => {
+        return execSync(cmd, {cwd: IntoCpsApp.getInstance().getActiveProject().getRootFilePath()})
     }
 
-    getUserData = () => {
-        let uname = this.execProjectCmd("git config user.name").toString().trim()
-        let email = this.execProjectCmd("git config user.email").toString().trim()
+    static getUserData = () => {
+        let uname = GitConnector.execProjectCmd("git config user.name").toString().trim()
+        let email = GitConnector.execProjectCmd("git config user.email").toString().trim()
         return new GitUser(uname, email)
     }
 
-    execProjectCmd = (cmd: string) => {
-        return execSync(cmd, {cwd: this.appInstance.getActiveProject().getRootFilePath()})
+    static isGitFolder = () => {
+        return pathExistsSync(path.join(IntoCpsApp.getInstance().getActiveProject().getRootFilePath(), ".git/"))
+    }
+
+    static initGit = () => {
+        if (!GitConnector.isGitFolder()) {
+            GitConnector.execProjectCmd("git init")
+            GitConnector.execProjectCmd("git add .")
+            GitConnector.execProjectCmd('git commit -c "Initialized project git"')
+        }
+    }
+
+    static getUserAsAgent = () => {
+        let user = GitConnector.getUserData()
+        return new Agent().setParameters(user.name, user.email)
+    }
+
+    static getFileHash = (path:string) => {
+        return GitConnector.execProjectCmd(`git hash-object ${path}`).toString().trim()
     }
 }
 

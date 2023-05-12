@@ -2,6 +2,8 @@ import { Component } from "@angular/core";
 import IntoCpsApp from "../../IntoCpsApp";
 import { Activity, Artefact, TrNode, Trace } from "../../traceability/models";
 import { TraceabilityController } from "../../traceability/TraceabilityController";
+import { GitConnector } from "../../traceability/git-connector";
+import { TraceMessageBuilder } from "../../traceability/TraceMessageBuilder";
 
 @Component({
     selector: "tr-page",
@@ -44,47 +46,46 @@ export class TraceabilityPageComponent {
 
 
     testPost = () => {
-        let now = new Date();
+        let builder = new TraceMessageBuilder()
+        builder.addProjectNode()
 
-        let sim = new Activity(
-            "intopcs:Simulation." + now.toISOString(),
-            "intocps:Simulation",
-            now
-        )
+        let now = new Date();
 
         let id1 = now.getMilliseconds() * 1234
         let id2 = now.getMilliseconds() * 4321
 
-        let mod1 = new Artefact(
-            "intocps:fmu.testmodel_a." + id1,
+        let a1 = new Artefact().setParameters(
             "intocps:fmu",
             "fmus/test1.zip",
             id1.toString()
         )
-
-        let mod2 = new Artefact(
-            "intocps:fmu.testmodel_b." + id2,
+        let a2 = new Artefact().setParameters(
             "intocps:fmu",
             "fmus/test2.zip",
             id2.toString()
         )
-
-        let tr1 = new Trace(
-            "intopcs:Simulation." + now.toISOString(),
-            "prov:used",
-            "intocps:fmu.testmodel_a." + id1
+        let sim = new Activity().setParameters(
+            "intocps:Simulation",
+            now
         )
 
-        let tr2 = new Trace(
-            "intopcs:Simulation." + now.toISOString(),
-            "prov:used",
-            "intocps:fmu.testmodel_b." + id2
-        )
-
-        this.TrController.client.post(
-            [sim, mod1, mod2],
-            [tr1, tr2]
-        )
+        builder.addNode(a1)
+        builder.addNode(a2)
+        builder.addNode(sim)
+        builder.addTrace(
+            new Trace(
+                sim.uri,
+                "prov:used",
+                a1.uri
+        ))
+        builder.addTrace(
+            new Trace(
+                sim.uri,
+                "prov:used",
+                a2.uri
+        ))
+        
+        this.TrController.client.push(builder)
     }
 
 }

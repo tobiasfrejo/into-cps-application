@@ -9,22 +9,10 @@ import * as jsonld from 'jsonld'
 import * as N3 from 'n3'
 import { DataFactory } from 'n3';
 import IntoCpsApp from '../IntoCpsApp';
+import  { terms, prefixes, applyContext, expandWithContext } from './contextHelper'
+import { TraceMessageBuilder } from './TraceMessageBuilder';
 
 const { namedNode, literal, quad } = DataFactory
-
-const terms: {[key: string]: string} = {
-    "name": "https://schema.org/name",
-    "email": "https://schema.org/email",
-    "hash": "https://schema.org/sha256",
-    "time": "https://schema.org/DateTime",
-    "type": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-    "path": "http://into-cps.org/ns#Path",
-}
-const prefixes: {[key: string]: string} = {
-    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    "prov": "http://www.w3.org/ns/prov#",
-    "intocps": "http://into-cps.org/ns#",
-}
 
 // Return the corresponding module based on URL
 let httpX = (url:URL) => {
@@ -56,7 +44,7 @@ class TraceabilityAPIClient {
 
         return new Promise((resolve, reject) => {
             httpX(url)
-                .get(url.href, options, this.handleResponse(resolve))
+                .get(url.href, options, this.handleDataResponse(resolve))
                 .on('error', e => {
                     console.error(`Got error: ${e.message}`)
                     reject(e)
@@ -74,9 +62,9 @@ class TraceabilityAPIClient {
             method: "POST"
         }
 
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             const req = httpX(url)
-                .request(url.href, options, this.handleResponse(resolve))
+                .request(url.href, options, this.handleSimpleResponse(resolve))
                 .on('error', e => {
                     reject(e)
                 });
@@ -89,7 +77,7 @@ class TraceabilityAPIClient {
 
     // Based on the example from the node docs: 
     // https://nodejs.org/docs/latest-v14.x/api/http.html#http_http_get_url_options_callback
-    handleResponse = (callback: (data: Object) => void = undefined) => {
+    handleDataResponse = (callback: (data: Object) => void = undefined) => {
         return (res: http.IncomingMessage) => {
             const {statusCode} = res;
             const contentType = res.headers['content-type'];
@@ -98,10 +86,11 @@ class TraceabilityAPIClient {
             let error;
             if (statusCode >= 300) {
                 error = new Error(`Request failed with code: ${statusCode}`)
-            } else if (!/^application\/(ld\+)?json/.test(contentType)) {
-                error = new Error(`Invalid content type ${contentType}. `+
-                        `Expected 'application/json' or 'application/ld+json'`)
-            }
+            } 
+            // else if (!/^application\/(ld\+)?json/.test(contentType)) {
+            //     error = new Error(`Invalid content type ${contentType}. `+
+            //             `Expected 'application/json' or 'application/ld+json'`)
+            // }
     
             if (error) {
                 res.destroy(error)
@@ -119,7 +108,7 @@ class TraceabilityAPIClient {
                         }
                     })
                     //console.log(rawData)
-                    let output = this.parseObjects(rawData)
+                    let output = this.parseObjects(rawData, contentType)
                     callback(output)
 
                     //const parsed = JSON.parse(rawData)
@@ -131,8 +120,27 @@ class TraceabilityAPIClient {
         }
     }
 
+    handleSimpleResponse = (resolve: (value: void) => void = () => {}) => {
+        return (res: http.IncomingMessage) => {
+            const {statusCode} = res;
+            const contentType = res.headers['content-type'];
+            console.log(statusCode, contentType)
+            
+            let error;
+            if (statusCode >= 300) {
+                error = new Error(`Request failed with code: ${statusCode}`)
+            } 
+    
+            if (error) {
+                res.destroy(error)
+                return;
+            }
 
-    parseObjects = async (data: string) => {
+            resolve()
+        }
+    }
+
+    parseObjects = async (data: string, contentType: string) => {
         const parser = new N3.Parser()
 
         let nodes: Array<TrNode> = []
@@ -154,13 +162,27 @@ class TraceabilityAPIClient {
         type T2 = {[uri: string]: T1}
         let rdfNodes: T2 = {}
 
-        let nquads = await jsonld.toRDF(JSON.parse(data))
+        let nquads;
+        if (contentType.split(';')[0] == "application/ld+json") {
+            nquads = await jsonld.toRDF(JSON.parse(data))
+        } else if (["text/turtle",
+                    "application/n-triples",
+                    "application/n-quads",
+                    "application/trig"
+                    ].includes(contentType.split(';')[0])) {
+            let parser = new N3.Parser()
+            nquads = parser.parse(data)
+        } else {
+            console.log("Unsupported content type", contentType)
+            return {}
+        }
+
         Object.values(nquads).forEach(quad => {
             console.log("[Quad]", quad)
 
-            let subj = this.applyContext(quad.subject.value)
-            let pred = this.applyContext(quad.predicate.value)
-            let obje = this.applyContext(quad.object.value)
+            let subj = applyContext(quad.subject.value)
+            let pred = applyContext(quad.predicate.value)
+            let obje = applyContext(quad.object.value)
 
             // Sort the returned RDF quads into traces and node parameters
 
@@ -186,82 +208,10 @@ class TraceabilityAPIClient {
         for (const [sid, kv] of Object.entries(rdfNodes)) {
             console.log(sid, JSON.stringify(kv, null, 2))
 
-            if ('type' in kv) {
-                switch (kv['type']) {
-                    case 'prov:Agent':
-                        nodes.push(new Agent(
-                            sid, 
-                            kv['name'], 
-                            kv['email']
-                        ))
-                        break;
-                    
-                    case 'prov:Activity':
-                        nodes.push(new Activity(
-                            sid, 
-                            kv['type'], 
-                            new Date(kv['time'])
-                        ))
-                        break;
-
-                    case 'prov:Entity':
-                        if (!('intocps:EntityType' in kv)) {
-                            console.error("Improper Entity: " + sid)
-                            console.debug(JSON.stringify(kv, null, 2))
-                        }
-
-                        else if (kv['intocps:EntityType'] === 'intocps:Tool')
-                            nodes.push(new Tool(
-                                sid, 
-                                kv['intocps:ToolType'], 
-                                kv['name'], 
-                                kv['intocps:version']
-                            ))
-
-                        else if (kv['intocps:EntityType'] === 'intocps:Artefact')
-                            nodes.push(new Artefact(
-                                sid, 
-                                kv['intocps:ArtefactType'],
-                                kv['path'],
-                                kv['hash']
-                            ))
-                        
-                        break;
-
-                    default:
-                        break;
-                }
-            }
+            nodes.push(new TrNode().load(sid, kv))
         }
 
         return {nodes, traces}
-    }
-
-    applyContext = (val: string) => {
-        for(const [term, uri] of Object.entries(terms)) {
-            if (val === uri) return term
-        }
-
-        for(const [prefix, full] of Object.entries(prefixes)) {
-            if (val.startsWith(full))
-                return val.replace(full, prefix+':')
-        }
-
-        return val
-    }
-
-    expandWithContext = (val:string) => {
-        if (val in terms) {
-            return terms[val]
-        }
-
-        for(const [prefix, full] of Object.entries(prefixes)) {
-            if (val.startsWith(prefix+':')) {
-                return val.replace(prefix+':', full)
-            }
-        }
-
-        return val
     }
 
     getSimulations() {
@@ -282,155 +232,11 @@ class TraceabilityAPIClient {
     }
 
 
-    post(nodes: Array<TrNode> = [], traces: Array<Trace> = []) {
-        const writer = new N3.Writer({prefixes, format: 'N-Triples'})
-
-        traces.forEach(tr => {
-            writer.addQuad(
-                namedNode(this.expandWithContext(tr.subject)),
-                namedNode(this.expandWithContext(tr.predicate)),
-                namedNode(this.expandWithContext(tr.object))
-            )
+    push(builder: TraceMessageBuilder) {
+        return builder.writerEnd( j => {
+            return this.sendPost("push", j)
         })
-
-        let projectUri = "intocps:project." + IntoCpsApp.getInstance().activeProject.getId()
-        writer.addQuad(
-            namedNode(this.expandWithContext(projectUri)),
-            namedNode(this.expandWithContext("type")),
-            namedNode(this.expandWithContext("prov:Entity"))
-        )
-        writer.addQuad(
-            namedNode(this.expandWithContext(projectUri)),
-            namedNode(this.expandWithContext("intocps:EntityType")),
-            namedNode(this.expandWithContext("intocps:Project"))
-        )
-        writer.addQuad(
-            namedNode(this.expandWithContext(projectUri)),
-            namedNode(this.expandWithContext("name")),
-            literal(IntoCpsApp.getInstance().activeProject.getName())
-        )
-
-        // Should probably be moved into models
-        nodes.forEach(nd => {
-            console.log(nd)
-            let node
-            switch (nd.className) {
-                case "Activity":
-                    node = nd as Activity
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                        namedNode("http://www.w3.org/ns/prov#Activity")
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("intocps:ActivityType")),
-                        namedNode(this.expandWithContext(node.type))
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("time")),
-                        literal(node.time.toISOString())
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("intocps:InProject")),
-                        namedNode(this.expandWithContext(projectUri))
-                    )
-                    break;
-                    
-                case "Agent":
-                    node = nd as Agent
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                        namedNode("http://www.w3.org/ns/prov#Agent")
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("name")),
-                        literal(node.name)
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("email")),
-                        literal(node.email)
-                    )
-                    break;
-                
-                case "Artefact":
-                    node = nd as Artefact
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                        namedNode("http://www.w3.org/ns/prov#Entity")
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("intocps:EntityType")),
-                        namedNode(this.expandWithContext("intocps:Artefact"))
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("intocps:ArtefactType")),
-                        namedNode(this.expandWithContext(node.type))
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("path")),
-                        literal(node.path)
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("hash")),
-                        literal(node.hash)
-                    )
-                    break;
-                    
-                case "Tool":
-                    node = nd as Tool
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                        namedNode("http://www.w3.org/ns/prov#Entity")
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("intocps:EntityType")),
-                        namedNode(this.expandWithContext("intocps:Tool"))
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("intocps:ToolType")),
-                        namedNode(this.expandWithContext(node.type))
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("name")),
-                        literal(node.name)
-                    )
-                    writer.addQuad(
-                        namedNode(this.expandWithContext(node.uri)),
-                        namedNode(this.expandWithContext("version")),
-                        literal(node.version)
-                    )
-                    break;
-            
-                default:
-                    console.warn("Default case; ", nd.constructor.name)
-                    break;
-            }
-        })
-
-        writer.end(async (error, result) => {
-            console.log(result)
-
-            const j1 = await jsonld.fromRDF(result, {format: "application/n-quads"})
-            const j2 = await jsonld.compact(j1, {...prefixes, ...terms})
-
-            this.sendPost("push", j2)
-        })
-    }        
+    }
 }
 
 export {TraceabilityAPIClient}

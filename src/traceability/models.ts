@@ -1,5 +1,6 @@
 import { GitConnector } from "./git-connector";
 import IntoCpsApp from "../IntoCpsApp";
+import { assert } from "console";
 
 class Trace {
     subject: string
@@ -20,9 +21,41 @@ class TrNode {
     specifier: string
     projectId: string
 
-    constructor (uri: string) {
+    constructor () {
         this.className = "TrNode"
+    }
+
+    load(uri:string, parameters:{[key: string]: string}) {
+        if ('type' in parameters) {
+            switch (parameters['type']) {
+                case 'prov:Agent':
+                    return new Agent().load(uri, parameters)
+
+                case 'prov:Activity':
+                    return new Activity().load(uri, parameters)
+
+                case 'prov:Entity':
+                    if (!('intocps:EntityType' in parameters)) {
+                        console.error("Improper Entity: " + uri)
+                        console.debug(JSON.stringify(parameters, null, 2))
+                    }
+
+                    else if (parameters['intocps:EntityType'] === 'intocps:Tool')
+                        return new Tool().load(uri, parameters)
+
+                    else if (parameters['intocps:EntityType'] === 'intocps:Artefact')
+                        return new Artefact().load(uri, parameters)
+                    
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+
         this.uri = uri
+        return this
     }
 
     setProjectId(id: string = null) {
@@ -30,6 +63,8 @@ class TrNode {
             this.projectId = IntoCpsApp.getInstance().activeProject.getId()
         else
             this.projectId = id
+        
+        return this
     }
 
     getParameters() {
@@ -43,19 +78,27 @@ class TrNode {
 class Agent extends TrNode {
     name: string
     email: string
-    constructor (uri: string, name: string=undefined, email: string=undefined) {
-        super(uri)
+    constructor () {
+        super()
         this.className = "Agent"
         this.specifier = "prov:Agent"
-        this.name = name
-        this.email = email
     }
 
-    fromGit() {
-        let gc = new GitConnector()
-        let u = gc.getUserData()
-        this.name = u.username
-        this.email = u.email
+    load(uri:string, parameters:{[key:string]:string}) {
+        assert(uri == "mailto:"+parameters['email'])
+
+        this.uri = uri
+        this.name = parameters['name']
+        this.email = parameters['email']
+
+        return this
+    }
+
+    setParameters(name: string, email: string) {
+        this.uri = "mailto:" + email
+        this.name = name
+        this.email = email
+        return this
     }
 
     getParameters() {
@@ -70,12 +113,27 @@ class Agent extends TrNode {
 class Activity extends TrNode {
     type: string
     time: Date
-    constructor (uri: string, type: string, time: Date) {
-        super(uri)
+    constructor () {
+        super()
         this.className = "Activity"
         this.specifier = "prov:Activity"
+    }
+
+    load(uri:string, parameters:{[key:string]:string}) {
+        this.uri = uri
+        this.type = parameters['type']
+        this.time = new Date(parameters['time'])
+        
+        return this
+    }
+
+    setParameters(type:string, time:Date) {
         this.type = type
         this.time = time
+
+        this.uri = `intocps:Activity.${type}.${time.toISOString()}`
+
+        return this
     }
 
     getParameters() {
@@ -89,11 +147,17 @@ class Activity extends TrNode {
 
 class Entity extends TrNode {
     type: string
-    constructor (uri: string, type: string) {
-        super(uri)
+    constructor () {
+        super()
         this.className = "Entity"
         this.specifier = "prov:Entity"
-        this.type = type
+    }
+
+    load(uri:string, parameters:{[key:string]:string}) {
+        this.uri = uri
+        this.type = parameters['type']
+        
+        return this
     }
 
     getParameters() {
@@ -108,11 +172,28 @@ class Artefact extends Entity {
     path: string
     hash: string
 
-    constructor (uri: string, type: string, path: string, hash: string) {
-        super(uri, type)
+    constructor () {
+        super()
         this.className = "Artefact"
+    }
+
+    load(uri:string, parameters:{[key:string]:string}) {
+        this.uri = uri
+        this.type = parameters['type']
+        this.path = parameters['path']
+        this.hash = parameters['hash']
+        
+        return this
+    }
+
+    setParameters(type:string, path: string, hash: string) {
+        this.type = type
         this.path = path
         this.hash = hash
+
+        this.uri = `intocps:Entity.${type}.${hash}`
+
+        return this
     }
 
     getParameters() {
@@ -128,11 +209,28 @@ class Tool extends Entity {
     name: string
     version: string
 
-    constructor(uri:string, type:string, name:string, version:string) {
-        super(uri, type)
+    constructor() {
+        super()
         this.className = "Tool"
+    }
+
+    load(uri:string, parameters:{[key:string]:string}) {
+        this.uri = uri
+        this.type = parameters['type']
+        this.name = parameters['name']
+        this.version = parameters['version']
+        
+        return this
+    }
+
+    setParameters(type:string, name: string, version: string) {
+        this.type = type
         this.name = name
         this.version = version
+
+        this.uri = `intocps:Entity.${type}.${name} ${version}`
+
+        return this
     }
 
     getParameters() {

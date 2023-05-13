@@ -6,6 +6,7 @@ import { TraceMessageBuilder } from "./TraceMessageBuilder";
 import { Activity, Trace, TrNode, Agent, Tool, Artefact } from "./models";
 import { TraceabilityAPIClient } from "./trace-api-client";
 import { GitConnector } from "./git-connector";
+import { CoSimulationConfig } from "../intocps-configurations/CoSimulationConfig";
 
 export class TraceabilityController {
     client: TraceabilityAPIClient
@@ -30,15 +31,17 @@ export class TraceabilityController {
         // Get FMUs in MM
         let fmuPaths = multiModelConfig.fmus.map(fmu => fmu.path)
         let rootPath = IntoCpsApp.getInstance().getActiveProject().getRootFilePath()
+        let relativeMmPath = path.relative(rootPath, multiModelConfig.sourcePath)
+
         let fmuUris = fmuPaths.map(fmuPath => {
-            let relativePath = fmuPath.startsWith(rootPath) ? path.normalize(fmuPath.replace(rootPath, './')) : fmuPath
+            let relativePath = path.relative(rootPath, fmuPath)
             let fmuNode = new Artefact().fmu(relativePath)
             builder.addNode(fmuNode)
             return fmuNode.uri
         })
 
         // Get MM file
-        let mmConfNode = new Artefact().mmConfig(multiModelConfig.sourcePath)
+        let mmConfNode = new Artefact().mmConfig(relativeMmPath)
         builder.addNode(mmConfNode)
 
         // Create MM Config Activity
@@ -79,7 +82,7 @@ export class TraceabilityController {
         ))
 
         if (prevHash) {
-            let prevMm = new Artefact().mmConfig(multiModelConfig.sourcePath, prevHash)
+            let prevMm = new Artefact().mmConfig(relativeMmPath, prevHash)
             builder.addNode(prevMm)
             builder.addTrace(new Trace(
                 mmConfNode.uri,
@@ -91,10 +94,78 @@ export class TraceabilityController {
         this.client.push(builder)
     }
 
-    createTraceSimConfig = () => {
+    createTraceCoSimConfig = (coSimConfig: CoSimulationConfig, prevHash: string) => {
+        // Do nothing if file is unchanged
+        if (GitConnector.getFileHash(coSimConfig.sourcePath) == prevHash) {
+            console.log("No change in config. Will not send trace!")
+            return
+        }
+
+        let rootPath = IntoCpsApp.getInstance().getActiveProject().getRootFilePath()
+        let relativeSourcePath = path.relative(rootPath, coSimConfig.sourcePath)
+
+        let builder = new TraceMessageBuilder()
+        builder.addProjectNode()
+
+        let agent = GitConnector.getUserAsAgent()
+        builder.addNode(agent)
+
+        let app = new Tool().intoCpsApp()
+        builder.addNode(app)
+
+        
         // Get used MM
+        let mm = new Artefact().mmConfig(path.relative(rootPath, coSimConfig.multiModel.sourcePath))
+        builder.addNode(mm)
+
         // Get Simulation Config file
+        let conf = new Artefact().coSimConfig(relativeSourcePath)
+        builder.addNode(conf)
+
         // Create Simulaton Config activity
+        let act = new Activity().coSimConfigCreation()
+        builder.addNode(act)
+
+
+        /* TRACES */
+        // Act -used-> MM
+        builder.addTrace(new Trace(
+            act.uri, "prov:used", mm.uri
+        ))
+
+        // Act -used-> App
+        builder.addTrace(new Trace(
+            act.uri, "prov:used", app.uri
+        ))
+
+        // conf -generatedBy-> Act
+        builder.addTrace(new Trace(
+            conf.uri, "prov:wasGeneratedBy", act.uri
+        ))
+
+        // conf -wasAttributedTo- agent
+        builder.addTrace(new Trace(
+            conf.uri, "prov:wasAttributedTo", agent.uri
+        ))
+
+        // act -wasAssociatedWith-> agent
+        builder.addTrace(new Trace(
+            act.uri, "prov:wasAssociatedWith", agent.uri
+        ))
+        
+
+        // conf -derivedFrom-> prevConf 
+        if (prevHash) {
+            let prevMm = new Artefact().coSimConfig(relativeSourcePath, prevHash)
+            builder.addNode(prevMm)
+            builder.addTrace(new Trace(
+                conf.uri,
+                "prov:wasDerivedFrom",
+                prevMm.uri
+            ))
+        }
+
+        this.client.push(builder)
     }
 
     createTraceSimulation = () => {

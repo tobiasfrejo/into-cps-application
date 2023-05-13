@@ -144,9 +144,16 @@ class Activity extends TrNode {
         }
     }
 
-    mmConfigCreation(date:Date = undefined) {
+    mmConfigCreation(date:Date = null) {
         return this.setParameters(
-            "intocps:multiModelConfigCreation",
+            "intocps:modelCreation",
+            date ? date : new Date()
+        )
+    }
+
+    coSimConfigCreation(date:Date=null) {
+        return this.setParameters(
+            "intocps:simulationCreation",
             date ? date : new Date()
         )
     }
@@ -226,6 +233,14 @@ class Artefact extends Entity {
             hash? hash : GitConnector.getFileHash(path)
         )
     }
+
+    coSimConfig(path:string, hash:string=null) {
+        return this.setParameters(
+            "intocps:coSimConfig",
+            path,
+            hash? hash : GitConnector.getFileHash(path)
+        )
+    }
 }
 
 class Tool extends Entity {
@@ -267,7 +282,7 @@ class Tool extends Entity {
     intoCpsApp() {
         if (IntoCpsApp.getInstance().app.getName() == "Electron")
             return this.setParameters(
-                "intocps:CoSimGui",
+                "intocps:softwareTool",
                 "INTO-CPS Application",
                 "dev-build"
             )

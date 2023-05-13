@@ -48,6 +48,7 @@ import { ScalarVariable, CausalityType, Instance, InstanceScalarPair, ScalarVari
 import { lessThanValidator2, numberValidator, uniqueGroupPropertyValidator } from "../shared/validators";
 import { NavigationService } from "../shared/navigation.service";
 import { WarningMessage } from "../../intocps-configurations/Messages";
+import { GitConnector } from "../../traceability/git-connector";
 
 const dialog = require("electron").remote.dialog;
 
@@ -216,15 +217,22 @@ export class CoeConfigurationComponent {
 			}
 		}
 
+		let prevHash = GitConnector.getFileHash(this.config.sourcePath)
 		if (override) {
 			this.config
 				.saveOverride()
-				.then(() => this.change.emit(this.path))
+				.then(() => {
+					this.change.emit(this.path)
+					IntoCpsApp.getInstance().trController.createTraceCoSimConfig(this.config, prevHash)
+				})
 				.catch((error) => console.error("error when overriding save: " + error));
 		} else {
 			this.config
 				.save()
-				.then(() => this.change.emit(this.path))
+				.then(() => {
+					this.change.emit(this.path)
+					IntoCpsApp.getInstance().trController.createTraceCoSimConfig(this.config, prevHash)
+				})
 				.catch((error) => console.error("error when saving: " + error));
 		}
 

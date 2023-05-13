@@ -131,7 +131,7 @@ class Activity extends TrNode {
         this.type = type
         this.time = time
 
-        this.uri = `intocps:Activity.${type}.${time.toISOString()}`
+        this.uri = `intocps:Activity.${type.replace(/^intocps:/, '')}.${time.toISOString()}`
 
         return this
     }
@@ -142,6 +142,13 @@ class Activity extends TrNode {
             "type": this.type,
             "time": this.time.toISOString()
         }
+    }
+
+    mmConfigCreation(date:Date = undefined) {
+        return this.setParameters(
+            "intocps:multiModelConfigCreation",
+            date ? date : new Date()
+        )
     }
 }
 
@@ -191,7 +198,7 @@ class Artefact extends Entity {
         this.path = path
         this.hash = hash
 
-        this.uri = `intocps:Entity.${type}.${hash}`
+        this.uri = `intocps:Artefact.${type.replace(/^intocps:/, '')}.${hash}`
 
         return this
     }
@@ -202,6 +209,22 @@ class Artefact extends Entity {
             "path": this.path,
             "hash": this.hash,
         }
+    }
+
+    fmu(path:string) {
+        return this.setParameters(
+            "intocps:fmu",
+            path,
+            GitConnector.getFileHash(path)
+        )
+    }
+
+    mmConfig(path:string, hash:string=null) {
+        return this.setParameters(
+            "intocps:multiModelConfig",
+            path,
+            hash? hash : GitConnector.getFileHash(path)
+        )
     }
 }
 
@@ -228,7 +251,7 @@ class Tool extends Entity {
         this.name = name
         this.version = version
 
-        this.uri = `intocps:Entity.${type}.${name} ${version}`
+        this.uri = `intocps:Tool.${type.replace(/^intocps:/, '')}.${name.replace(/[^0-9a-zA-Z_\-\.]/g, '_')}_${version}`
 
         return this
     }
@@ -239,6 +262,22 @@ class Tool extends Entity {
             "name": this.name,
             "intocps:version": this.version,
         }
+    }
+
+    intoCpsApp() {
+        if (IntoCpsApp.getInstance().app.getName() == "Electron")
+            return this.setParameters(
+                "intocps:CoSimGui",
+                "INTO-CPS Application",
+                "dev-build"
+            )
+        else 
+            return this.setParameters(
+                "intocps:CoSimGui",
+                IntoCpsApp.getInstance().app.getName(),
+                IntoCpsApp.getInstance().app.getVersion()
+            )
+                
     }
 }
 

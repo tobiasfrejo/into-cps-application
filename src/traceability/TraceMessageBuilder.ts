@@ -39,7 +39,7 @@ export class TraceMessageBuilder {
     
 
 
-    addNode(node: TrNode, autoAssociate:Boolean=true) {
+    addNode(node: TrNode, autoAssociate:Boolean=false) {
         let n
         switch (node.className) {
             case "Activity":
@@ -72,9 +72,6 @@ export class TraceMessageBuilder {
                         namedNode(expandWithContext("prov:wasAssociatedWith")),
                         namedNode(agent.uri)
                     )
-
-                    
-
                 }
                 break;
                 
@@ -188,7 +185,12 @@ export class TraceMessageBuilder {
     
                     resolve(callback(j2))
                 } catch (err) {
-                    console.error(err)
+                    let lineNumMatch = err.message.match(/N-Quads parse error on line (\d+)/)
+                    if (lineNumMatch) {
+                        console.error("Error in N-Quads, line", lineNumMatch[1], ":", result.split("\n")[lineNumMatch[1]-1])
+                    } else {
+                        console.error(err)
+                    }
                     reject(err)
                 }
             })

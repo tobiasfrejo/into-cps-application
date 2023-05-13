@@ -5,6 +5,7 @@ const terms: {[key: string]: string} = {
     "time": "https://schema.org/DateTime",
     "type": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
     "path": "http://into-cps.org/ns#Path",
+    "version": "http://into-cps.org/ns#Version"
 }
 const prefixes: {[key: string]: string} = {
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",

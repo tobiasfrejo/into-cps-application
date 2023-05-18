@@ -42,17 +42,18 @@ export class TrSimulationComponent implements OnInit {
     }
 
     getSimTraces() {
-        return this.TrController.client.getSimulationDetails(this.node.uri)
-        .then(res => {
-            console.log("Received", JSON.stringify(res, null, 2))
+        if (this.TrController.client)
+            return this.TrController.client.getSimulationDetails(this.node.uri)
+            .then(res => {
+                console.log("Received", JSON.stringify(res, null, 2))
 
-            this.fmus = res.fmus;
-            this.mm_artefact = res.mmConfig;
-            this.sim_artefact = res.simulationConfig;
-            this.engine = res.engine;
-            this.agent = res.agent;
-            this.result_artefact = res.result;
-        })
+                this.fmus = res.fmus;
+                this.mm_artefact = res.mmConfig;
+                this.sim_artefact = res.simulationConfig;
+                this.engine = res.engine;
+                this.agent = res.agent;
+                this.result_artefact = res.result;
+            })
     }
 
     openModel() {

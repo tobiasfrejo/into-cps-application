@@ -48,6 +48,8 @@ export namespace SettingKeys {
     export var DEV_EXAMPLE_REPO = "dev_example_site";
     export var DEFAULT_PROJECTS_FOLDER_PATH = "default_projects_folder_path";
     export var ENABLE_TRACEABILITY = "enable_traceability";
+    //export var INTERNAL_TRACEABILITY_SERVER = "internal_traceability_server";
+    export var TRACEABILITY_SERVER_URL = "traceability_server_url";
     export var LOCAL_UPDATE_SITE = "local_update_site";
     export var USE_LOCAL_UPDATE_SITE = "use_local_update_site";
     export var GRAPH_MAX_DATA_POINTS = "graph_max_data_points";
@@ -66,6 +68,8 @@ export namespace SettingKeys {
     DEFAULT_VALUES[TRACE_DAEMON_PORT] = "8083";
     DEFAULT_VALUES[COE_REMOTE_HOST] = false;
     DEFAULT_VALUES[ENABLE_TRACEABILITY] = false;
+    //DEFAULT_VALUES[INTERNAL_TRACEABILITY_SERVER] = false;
+    DEFAULT_VALUES[TRACEABILITY_SERVER_URL] = "http://localhost:8080/";
     DEFAULT_VALUES[LOCAL_UPDATE_SITE] = "";
     DEFAULT_VALUES[USE_LOCAL_UPDATE_SITE] = false;
     DEFAULT_VALUES[GRAPH_MAX_DATA_POINTS] = 1000;
@@ -77,7 +81,7 @@ export namespace SettingKeys {
     VALUE_DESCRIPTION[INSTALL_DIR] = "Installation folder for downloads obtained through the Download Manager."
     VALUE_DESCRIPTION[INSTALL_TMP_DIR] = "Location for downloads obtained through the Download Manager.";
     VALUE_DESCRIPTION[COE_URL] = "URL used for the COE connection.";
-    VALUE_DESCRIPTION[TRACE_DAEMON_PORT] = "The port on which the traceability daemon listens for messages.";
+    VALUE_DESCRIPTION[TRACE_DAEMON_PORT] = "(Deprecated) The port on which the traceability daemon listens for messages.";
     VALUE_DESCRIPTION[COE_REMOTE_HOST] = "COE is not running on the same filesystem as the INTO-CPS Application.  When checked, FMUs are uploaded to the remote COE.";
     VALUE_DESCRIPTION[COE_JAR_PATH] = "Custom .jar path for the COE. Leave blank to search the install folder.";
     VALUE_DESCRIPTION[RTTESTER_INSTALL_DIR] = "RT-Tester installation location.";
@@ -89,7 +93,9 @@ export namespace SettingKeys {
     VALUE_DESCRIPTION[EXAMPLE_REPO] = "Examples repository URL.";
     VALUE_DESCRIPTION[DEV_EXAMPLE_REPO] = "Development mode examples repository URL.";
     VALUE_DESCRIPTION[DEFAULT_PROJECTS_FOLDER_PATH] = "Default location of all projects.";
-    VALUE_DESCRIPTION[ENABLE_TRACEABILITY] = "Enable tracebility tracking in both the INTO-CPS Application and the traceability daemon.  This enables remote tools to submit traceability information to the open project.";
+    VALUE_DESCRIPTION[ENABLE_TRACEABILITY] = "Enable tracebility tracking in the INTO-CPS Application.  ";
+    //VALUE_DESCRIPTION[INTERNAL_TRACEABILITY_SERVER] = "(NOT IMPLEMENTED) Start the traceability API server inside the INTO-CPS Application. Requires Docker to be installed.  This enables remote tools to submit traceability information to the open project.  If disabled and "+ENABLE_TRACEABILITY+" is enabled, the server is expected to be running externally.";
+    VALUE_DESCRIPTION[TRACEABILITY_SERVER_URL] = "The URL to the traceability API server."//  Is ignored if "+INTERNAL_TRACEABILITY_SERVER+" is true.";
     VALUE_DESCRIPTION[LOCAL_UPDATE_SITE] = "A file:// URI to a local INCO-CPS Application update site.";
     VALUE_DESCRIPTION[USE_LOCAL_UPDATE_SITE] = "Enable using the local INTO-CPS Application update site.";
     VALUE_DESCRIPTION[GRAPH_MAX_DATA_POINTS] = "Number of samples used to plot data in live view graphs.";
@@ -101,7 +107,7 @@ export namespace SettingKeys {
     VALUE_DISPLAYNAME[INSTALL_DIR] = "Downloads Installation Location";
     VALUE_DISPLAYNAME[INSTALL_TMP_DIR] = "Downloads Location";
     VALUE_DISPLAYNAME[COE_URL] = "COE URL";
-    VALUE_DISPLAYNAME[TRACE_DAEMON_PORT] = "Traceability Daemon Port";
+    VALUE_DISPLAYNAME[TRACE_DAEMON_PORT] = "Traceability Daemon Port (deprecated)";
     VALUE_DISPLAYNAME[COE_REMOTE_HOST] = "COE Is Remote";
     VALUE_DISPLAYNAME[COE_JAR_PATH] = "COE .jar Location";
     VALUE_DISPLAYNAME[RTTESTER_INSTALL_DIR] = "RT-Tester Istallation Location";
@@ -114,6 +120,8 @@ export namespace SettingKeys {
     VALUE_DISPLAYNAME[DEV_EXAMPLE_REPO] = "Development Mode Examples URL";
     VALUE_DISPLAYNAME[DEFAULT_PROJECTS_FOLDER_PATH] = "Default Project Location";
     VALUE_DISPLAYNAME[ENABLE_TRACEABILITY] = "Enable Traceability";
+    //VALUE_DISPLAYNAME[INTERNAL_TRACEABILITY_SERVER] = "Enable internal traceability server";
+    VALUE_DISPLAYNAME[TRACEABILITY_SERVER_URL] = "Traceability server URL";
     VALUE_DISPLAYNAME[LOCAL_UPDATE_SITE] = "Local Update Site";
     VALUE_DISPLAYNAME[USE_LOCAL_UPDATE_SITE] = "Enable Local Update Site";
     VALUE_DISPLAYNAME[GRAPH_MAX_DATA_POINTS] = "Number of Samples in Graph";

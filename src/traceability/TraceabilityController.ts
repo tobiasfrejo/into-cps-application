@@ -7,16 +7,35 @@ import { TraceabilityAPIClient } from "./trace-api-client";
 import { GitConnector } from "./git-connector";
 import { CoSimulationConfig } from "../intocps-configurations/CoSimulationConfig";
 import { Prov, ToolType } from "./TraceabilityKeys";
+import { SettingKeys } from "../settings/SettingKeys";
 
 export class TraceabilityController {
     client: TraceabilityAPIClient
     receivedData: Object
+    enabled: boolean = false
 
     constructor () {
-        this.client = new TraceabilityAPIClient("http://localhost:8080/v2/")
+        // Wait until the IntoCpsApp has initialized fully
+        const checkAppInitialized = () => {
+            if (!IntoCpsApp.getInstance()) {
+                setTimeout(checkAppInitialized, 50)
+            } else {
+                this.intialize()
+            }
+        }
+        checkAppInitialized()
+    }
+
+    intialize = () => {
+        this.enabled = IntoCpsApp.getInstance().getSettings().getValue(SettingKeys.ENABLE_TRACEABILITY)
+
+        if (!this.enabled) return
+        this.client = new TraceabilityAPIClient(path.join(IntoCpsApp.getInstance().getSettings().getValue(SettingKeys.TRACEABILITY_SERVER_URL), "v2/"))
     }
 
     createTraceMMConfig = (multiModelConfig: MultiModelConfig, prevHash:string = null) => {
+        if (!this.enabled) return
+
         if (GitConnector.getFileHash(multiModelConfig.sourcePath) == prevHash) return
         
         let builder = new TraceMessageBuilder()
@@ -95,6 +114,8 @@ export class TraceabilityController {
     }
 
     createTraceCoSimConfig = (coSimConfig: CoSimulationConfig, prevHash: string) => {
+        if (!this.enabled) return
+
         // Do nothing if file is unchanged
         if (GitConnector.getFileHash(coSimConfig.sourcePath) == prevHash) {
             console.log("No change in config. Will not send trace!")
@@ -173,6 +194,8 @@ export class TraceabilityController {
         coeInfo: {"name":string, "version":string},
         resultPath: string
     ) => {
+        if (!this.enabled) return
+
         let rootPath = IntoCpsApp.getInstance().getActiveProject().getRootFilePath()
         let relativeSourcePath = path.relative(rootPath, coSimConfig.sourcePath)
 

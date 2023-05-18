@@ -21,6 +21,7 @@ export class TraceabilityPageComponent {
     }
 
     getSimulations() {
+        if (!this.TrController.enabled) return
         console.log("Testing...")
         this.loading = true
         this.TrController.client.getSimulations()
@@ -35,6 +36,7 @@ export class TraceabilityPageComponent {
     }
 
     getNodes = () => {
+        if (!this.TrController.enabled) return
         this.loading = true
         this.TrController.client.sendGet('nodes')
         .then((rd: Object) => {

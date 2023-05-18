@@ -122,7 +122,7 @@ class Activity extends TrNode {
 
     load(uri:string, parameters:{[key:string]:string}) {
         this.uri = uri
-        this.type = parameters['type']
+        this.type = parameters[IntocpsPredicate.ACTIVITYTYPE]
         this.time = new Date(parameters['time'])
         
         return this
@@ -177,7 +177,7 @@ class Entity extends TrNode {
 
     load(uri:string, parameters:{[key:string]:string}) {
         this.uri = uri
-        this.type = parameters['type']
+        this.type = parameters[IntocpsPredicate.ENTITYTYPE]
         
         return this
     }
@@ -201,7 +201,7 @@ class Artefact extends Entity {
 
     load(uri:string, parameters:{[key:string]:string}) {
         this.uri = uri
-        this.type = parameters['type']
+        this.type = parameters[IntocpsPredicate.ARTEFACTTYPE]
         this.path = parameters['path']
         this.hash = parameters['hash']
         
@@ -270,7 +270,7 @@ class Tool extends Entity {
 
     load(uri:string, parameters:{[key:string]:string}) {
         this.uri = uri
-        this.type = parameters['type']
+        this.type = parameters[IntocpsPredicate.TOOLTYPE]
         this.name = parameters['name']
         this.version = parameters['version']
         

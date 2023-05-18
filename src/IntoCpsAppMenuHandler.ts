@@ -72,4 +72,8 @@ export class IntoCpsAppMenuHandler {
     showTraceView: () =>void;
     openTraceability: () =>void;
     exportOvertureFmu: (type: string, path: string)=>void;
+
+    static getInstance(): IntoCpsAppMenuHandler {
+        return global.menuHandler
+    }
 }

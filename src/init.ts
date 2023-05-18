@@ -198,6 +198,7 @@ let controller: IViewController;
 let coeViewController: CoeServerStatusUiController = null;
 let coeLogViewController: CoeLogUiController=null;
 let traceabilityViewController: TraceabilityViewController=null;
+global.menuHandler = menuHandler;
 
 function closeView(): boolean {
     if (controller && controller.deInitialize) {

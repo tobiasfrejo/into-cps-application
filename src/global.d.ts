@@ -2,5 +2,6 @@
 declare module NodeJS  {
     interface Global {
         intoCpsApp: any
+        menuHandler: any
     }
 }

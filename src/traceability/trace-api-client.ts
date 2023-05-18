@@ -11,7 +11,7 @@ import { DataFactory } from 'n3';
 import IntoCpsApp from '../IntoCpsApp';
 import  { terms, prefixes, applyContext, expandWithContext } from './contextHelper'
 import { TraceMessageBuilder } from './TraceMessageBuilder';
-import { ActivityType, ArtefactType, IntocpsPredicate } from './TraceabilityKeys';
+import { ActivityType, ArtefactType, IntocpsPredicate, Prov, ToolType } from './TraceabilityKeys';
 
 const { namedNode, literal, quad } = DataFactory
 
@@ -72,7 +72,6 @@ class TraceabilityAPIClient {
             req.write(JSON.stringify(data));
             req.end();
         })
-        console.log(data)
     }
 
 
@@ -179,7 +178,7 @@ class TraceabilityAPIClient {
         }
 
         Object.values(nquads).forEach(quad => {
-            console.log("[Quad]", quad)
+            //console.log("[Quad]", quad)
 
             let subj = applyContext(quad.subject.value)
             let pred = applyContext(quad.predicate.value)
@@ -202,16 +201,17 @@ class TraceabilityAPIClient {
             rdfNodes[subj][pred] = obje
         })
 
-        console.log(traces)
-        console.log(rdfNodes)
+        //console.log(traces)
+        //console.log(rdfNodes)
 
         // Create node instances
         for (const [sid, kv] of Object.entries(rdfNodes)) {
-            console.log(sid, JSON.stringify(kv, null, 2))
+            //console.log(sid, JSON.stringify(kv, null, 2))
 
             nodes.push(new TrNode().load(sid, kv))
         }
 
+        console.log("Got", nodes.length, "nodes and", traces.length, "traces")
         return {nodes, traces}
     }
 
@@ -225,11 +225,89 @@ class TraceabilityAPIClient {
     }
 
     getFmusInSimulation(simUri: string) {
-        let params = {
-            [IntocpsPredicate.ARTEFACTTYPE]: ArtefactType.FMU
-        }
+        return new Promise<Array<Artefact>>((resolve, reject) => {
+            this.sendGet(`traces/${Prov.USED}/from/${simUri}`, {
+                [IntocpsPredicate.ARTEFACTTYPE]: ArtefactType.FMU
+            })
+            .then((res: {nodes: Array<TrNode>, traces: Array<Trace>}) => {
+                let uris = res.traces.map(nd => nd.object)
+                resolve(res.nodes.filter(nd => uris.includes(nd.uri)) as Array<Artefact>)
+            })
+            .catch(reject)
+        })
+    }
 
-        return this.sendGet("traces/from/" + simUri,  params)
+    async getSimulationDetails(simUri: string) {
+        let result: Artefact
+        let fmus: Array<Artefact>
+        let mmConfig: Artefact
+        let simulationConfig: Artefact
+        let agent: Agent
+        let engine: Tool
+        
+        await Promise.all([
+            this.sendGet(`traces/${Prov.WASGENERATEDBY}/to/${simUri}`, {
+                [IntocpsPredicate.ARTEFACTTYPE]: ArtefactType.SIMRESULT
+            })
+            .then((res: {nodes: Array<TrNode>, traces: Array<Trace>}) => {
+                let resUri = ""
+                for (let tr of res.traces) {
+                    if (tr.predicate == Prov.WASGENERATEDBY) {
+                        resUri = tr.subject;
+                        break;
+                    }
+                }
+                for (let nd of res.nodes) {
+                    if (nd.uri == resUri) {
+                        result = nd as Artefact
+                        break;
+                    }
+                }
+            }),
+
+            this.sendGet(`traces/from/${simUri}`)
+            .then((res: {nodes: Array<TrNode>, traces: Array<Trace>}) => {
+                fmus = []
+                let agentUri: string
+                let used = res.traces.filter(tr => tr.predicate == Prov.USED).map(tr=>tr.object)
+                for (let tr of res.traces) {
+                    if (tr.predicate == Prov.WASASSOCIATEDWITH) {
+                        agentUri = tr.object;
+                        break;
+                    }
+                }
+
+                res.nodes.forEach(nd => {
+                    console.log("Sorting node", nd.uri)
+                    if (used.includes(nd.uri) && nd.className == "Artefact" ) {
+                        if ((nd as Artefact).type == ArtefactType.FMU) {
+                            fmus.push(nd as Artefact);
+                        } else if ((nd as Artefact).type == ArtefactType.MMCONFIG) {
+                            mmConfig = nd as Artefact;
+                        } else if ((nd as Artefact).type == ArtefactType.SIMCONFIG) {
+                            simulationConfig = nd as Artefact
+                        } else {
+                            console.warn("Unexpected artefact: ", JSON.stringify(nd))
+                        }
+                    } else if (used.includes(nd.uri) && nd.className == "Tool" && (nd as Tool).type == ToolType.COE) {
+                        engine = nd as Tool
+                    } else if (nd.uri == agentUri && nd.className == "Agent") {
+                        agent = nd as Agent
+                    } else {
+                        console.warn("Unexpected node: ", JSON.stringify(nd))
+                    }
+                })
+            }),
+        ])
+
+        return {
+            result,
+            fmus,
+            mmConfig,
+            simulationConfig,
+            agent,
+            engine
+        }
     }
 
 

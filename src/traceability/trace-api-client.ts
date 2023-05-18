@@ -1,6 +1,6 @@
 import * as http from 'http'
 import * as https from'https'
-import { Activity, Agent, Artefact, TrNode, Trace } from './models';
+import { Activity, Agent, Artefact, TrNode, Trace, getActiveProjectUri } from './models';
 
 import { Readable, Stream } from 'stream';
 import { Tool } from './models';
@@ -11,6 +11,7 @@ import { DataFactory } from 'n3';
 import IntoCpsApp from '../IntoCpsApp';
 import  { terms, prefixes, applyContext, expandWithContext } from './contextHelper'
 import { TraceMessageBuilder } from './TraceMessageBuilder';
+import { ActivityType, ArtefactType, IntocpsPredicate } from './TraceabilityKeys';
 
 const { namedNode, literal, quad } = DataFactory
 
@@ -216,8 +217,8 @@ class TraceabilityAPIClient {
 
     getSimulations() {
         let params = {
-            "projectId": "intocps:project." + IntoCpsApp.getInstance().activeProject.getId(),
-            "intocps:ActivityType": "intocps:Simulation"
+            "projectId": getActiveProjectUri(),
+            [IntocpsPredicate.ACTIVITYTYPE]: ActivityType.SIMULATION
         }
 
         return this.sendGet("nodes", params)
@@ -225,7 +226,7 @@ class TraceabilityAPIClient {
 
     getFmusInSimulation(simUri: string) {
         let params = {
-            "intocps:ArtefactType": "intocps:fmu"
+            [IntocpsPredicate.ARTEFACTTYPE]: ArtefactType.FMU
         }
 
         return this.sendGet("traces/from/" + simUri,  params)

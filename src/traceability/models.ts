@@ -1,6 +1,7 @@
 import { GitConnector } from "./git-connector";
 import IntoCpsApp from "../IntoCpsApp";
 import { assert } from "console";
+import { ActivityType, ArtefactType, EntityType, IntocpsPredicate, Prov, ToolType } from "./TraceabilityKeys";
 
 class Trace {
     subject: string
@@ -28,22 +29,22 @@ class TrNode {
     load(uri:string, parameters:{[key: string]: string}) {
         if ('type' in parameters) {
             switch (parameters['type']) {
-                case 'prov:Agent':
+                case Prov.AGENT:
                     return new Agent().load(uri, parameters)
 
-                case 'prov:Activity':
+                case Prov.ACTIVITY:
                     return new Activity().load(uri, parameters)
 
-                case 'prov:Entity':
-                    if (!('intocps:EntityType' in parameters)) {
+                case Prov.ENTITY:
+                    if (!(IntocpsPredicate.ENTITYTYPE in parameters)) {
                         console.error("Improper Entity: " + uri)
                         console.debug(JSON.stringify(parameters, null, 2))
                     }
 
-                    else if (parameters['intocps:EntityType'] === 'intocps:Tool')
+                    else if (parameters[IntocpsPredicate.ENTITYTYPE] === EntityType.TOOL)
                         return new Tool().load(uri, parameters)
 
-                    else if (parameters['intocps:EntityType'] === 'intocps:Artefact')
+                    else if (parameters[IntocpsPredicate.ENTITYTYPE] === EntityType.ARTEFACT)
                         return new Artefact().load(uri, parameters)
                     
                     break;
@@ -81,7 +82,7 @@ class Agent extends TrNode {
     constructor () {
         super()
         this.className = "Agent"
-        this.specifier = "prov:Agent"
+        this.specifier = Prov.AGENT
     }
 
     load(uri:string, parameters:{[key:string]:string}) {
@@ -116,7 +117,7 @@ class Activity extends TrNode {
     constructor () {
         super()
         this.className = "Activity"
-        this.specifier = "prov:Activity"
+        this.specifier = Prov.ACTIVITY
     }
 
     load(uri:string, parameters:{[key:string]:string}) {
@@ -146,14 +147,21 @@ class Activity extends TrNode {
 
     mmConfigCreation(date:Date = null) {
         return this.setParameters(
-            "intocps:modelCreation",
+            ActivityType.MMCREATE,
             date ? date : new Date()
         )
     }
 
     coSimConfigCreation(date:Date=null) {
         return this.setParameters(
-            "intocps:simulationCreation",
+            ActivityType.SIMCREATE,
+            date ? date : new Date()
+        )
+    }
+
+    simulation(date:Date=null) {
+        return this.setParameters(
+            ActivityType.SIMULATION,
             date ? date : new Date()
         )
     }
@@ -164,7 +172,7 @@ class Entity extends TrNode {
     constructor () {
         super()
         this.className = "Entity"
-        this.specifier = "prov:Entity"
+        this.specifier = Prov.ENTITY
     }
 
     load(uri:string, parameters:{[key:string]:string}) {
@@ -220,7 +228,7 @@ class Artefact extends Entity {
 
     fmu(path:string) {
         return this.setParameters(
-            "intocps:fmu",
+            ArtefactType.FMU,
             path,
             GitConnector.getFileHash(path)
         )
@@ -228,7 +236,7 @@ class Artefact extends Entity {
 
     mmConfig(path:string, hash:string=null) {
         return this.setParameters(
-            "intocps:multiModelConfig",
+            ArtefactType.MMCONFIG,
             path,
             hash? hash : GitConnector.getFileHash(path)
         )
@@ -236,9 +244,17 @@ class Artefact extends Entity {
 
     coSimConfig(path:string, hash:string=null) {
         return this.setParameters(
-            "intocps:coSimConfig",
+            ArtefactType.SIMCONFIG,
             path,
             hash? hash : GitConnector.getFileHash(path)
+        )
+    }
+
+    result(path:string) {
+        return this.setParameters(
+            ArtefactType.SIMRESULT,
+            path,
+            GitConnector.getFileHash(path)
         )
     }
 }
@@ -282,18 +298,22 @@ class Tool extends Entity {
     intoCpsApp() {
         if (IntoCpsApp.getInstance().app.getName() == "Electron")
             return this.setParameters(
-                "intocps:softwareTool",
+                ToolType.SOFTWARE,
                 "INTO-CPS Application",
                 "dev-build"
             )
         else 
             return this.setParameters(
-                "intocps:CoSimGui",
+                ToolType.SOFTWARE,
                 IntoCpsApp.getInstance().app.getName(),
                 IntoCpsApp.getInstance().app.getVersion()
             )
                 
     }
+}
+
+export function getActiveProjectUri() {
+    return "intocps:Project." + IntoCpsApp.getInstance().activeProject.getId()
 }
 
 export {Trace, TrNode, Activity, Agent, Entity, Artefact, Tool}

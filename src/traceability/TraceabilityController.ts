@@ -1,12 +1,12 @@
 import path = require("path");
 import IntoCpsApp from "../IntoCpsApp";
 import { MultiModelConfig } from "../intocps-configurations/MultiModelConfig";
-import { JsonLdBuilder } from "./JsonLdBuilder";
 import { TraceMessageBuilder } from "./TraceMessageBuilder";
 import { Activity, Trace, TrNode, Agent, Tool, Artefact } from "./models";
 import { TraceabilityAPIClient } from "./trace-api-client";
 import { GitConnector } from "./git-connector";
 import { CoSimulationConfig } from "../intocps-configurations/CoSimulationConfig";
+import { Prov, ToolType } from "./TraceabilityKeys";
 
 export class TraceabilityController {
     client: TraceabilityAPIClient
@@ -52,32 +52,32 @@ export class TraceabilityController {
         // Add traces
         builder.addTrace(new Trace(
             activity.uri,
-            "prov:wasAssociatedWith",
+            Prov.WASASSOCIATEDWITH,
             agent.uri
         ))
         builder.addTrace(new Trace(
             mmConfNode.uri,
-            "prov:wasAttributedTo",
+            Prov.WASATTRIBUTEDTO,
             agent.uri
         ))
 
         fmuUris.forEach(fmuUri => {
             builder.addTrace(new Trace(
                 activity.uri,
-                "prov:used",
+                Prov.USED,
                 fmuUri
                 ))
         })
 
         builder.addTrace(new Trace(
             mmConfNode.uri,
-            "prov:wasGeneratedBy",
+            Prov.WASGENERATEDBY,
             activity.uri
         ))
 
         builder.addTrace(new Trace(
             activity.uri,
-            "prov:used",
+            Prov.USED,
             app.uri
         ))
 
@@ -86,7 +86,7 @@ export class TraceabilityController {
             builder.addNode(prevMm)
             builder.addTrace(new Trace(
                 mmConfNode.uri,
-                "prov:wasDerivedFrom",
+                Prov.WASDERIVEDFROM,
                 prevMm.uri
             ))
         }
@@ -130,27 +130,27 @@ export class TraceabilityController {
         /* TRACES */
         // Act -used-> MM
         builder.addTrace(new Trace(
-            act.uri, "prov:used", mm.uri
+            act.uri, Prov.USED, mm.uri
         ))
 
         // Act -used-> App
         builder.addTrace(new Trace(
-            act.uri, "prov:used", app.uri
+            act.uri, Prov.USED, app.uri
         ))
 
         // conf -generatedBy-> Act
         builder.addTrace(new Trace(
-            conf.uri, "prov:wasGeneratedBy", act.uri
+            conf.uri, Prov.WASGENERATEDBY, act.uri
         ))
 
         // conf -wasAttributedTo- agent
         builder.addTrace(new Trace(
-            conf.uri, "prov:wasAttributedTo", agent.uri
+            conf.uri, Prov.WASATTRIBUTEDTO, agent.uri
         ))
 
         // act -wasAssociatedWith-> agent
         builder.addTrace(new Trace(
-            act.uri, "prov:wasAssociatedWith", agent.uri
+            act.uri, Prov.WASASSOCIATEDWITH, agent.uri
         ))
         
 
@@ -160,7 +160,7 @@ export class TraceabilityController {
             builder.addNode(prevMm)
             builder.addTrace(new Trace(
                 conf.uri,
-                "prov:wasDerivedFrom",
+                Prov.WASDERIVEDFROM,
                 prevMm.uri
             ))
         }
@@ -186,7 +186,7 @@ export class TraceabilityController {
         builder.addNode(app)
 
         let coe = new Tool().setParameters(
-            "intocps:coSimulationEngine",
+            ToolType.COE,
             coeInfo.name,
             coeInfo.version
         )
@@ -219,17 +219,17 @@ export class TraceabilityController {
         let activity = new Activity().simulation()
         builder.addNode(activity)
 
-        builder.addTrace(new Trace(activity.uri, "prov:used", app.uri))
-        builder.addTrace(new Trace(activity.uri, "prov:used", coe.uri))
-        builder.addTrace(new Trace(activity.uri, "prov:used", cosim.uri))
-        builder.addTrace(new Trace(activity.uri, "prov:used", mm.uri))
-        builder.addTrace(new Trace(activity.uri, "prov:wasAssociatedWith", agent.uri))
+        builder.addTrace(new Trace(activity.uri, Prov.USED, app.uri))
+        builder.addTrace(new Trace(activity.uri, Prov.USED, coe.uri))
+        builder.addTrace(new Trace(activity.uri, Prov.USED, cosim.uri))
+        builder.addTrace(new Trace(activity.uri, Prov.USED, mm.uri))
+        builder.addTrace(new Trace(activity.uri, Prov.WASASSOCIATEDWITH, agent.uri))
         fmuUris.forEach(fmuUri => {
-            builder.addTrace(new Trace(activity.uri, "prov:used", fmuUri))
+            builder.addTrace(new Trace(activity.uri, Prov.USED, fmuUri))
         })
 
-        builder.addTrace(new Trace(result.uri, "prov:wasGeneratedBy", activity.uri))
-        builder.addTrace(new Trace(result.uri, "prov:wasAttributedTo", agent.uri))
+        builder.addTrace(new Trace(result.uri, Prov.WASGENERATEDBY, activity.uri))
+        builder.addTrace(new Trace(result.uri, Prov.WASATTRIBUTEDTO, agent.uri))
 
 
         this.client.push(builder)

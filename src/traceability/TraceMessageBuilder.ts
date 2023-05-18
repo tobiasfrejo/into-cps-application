@@ -1,4 +1,4 @@
-import { Activity, Agent, Artefact, Tool, TrNode, Trace } from "./models";
+import { Activity, Agent, Artefact, Tool, TrNode, Trace, getActiveProjectUri } from "./models";
 import * as N3 from 'n3'
 import { DataFactory } from 'n3';
 import IntoCpsApp from "../IntoCpsApp";
@@ -9,6 +9,7 @@ import  { terms, prefixes, applyContext, expandWithContext } from './contextHelp
 import path = require("path");
 import fs = require("fs");
 import { Project } from "../proj/Project";
+import { EntityType, IntocpsPredicate, Prov } from "./TraceabilityKeys";
 
 export class TraceMessageBuilder {
     writer: N3.Writer
@@ -16,19 +17,19 @@ export class TraceMessageBuilder {
 
     constructor() {
         this.writer = new N3.Writer({prefixes, format: 'N-Triples'})
-        this.projectUri = "intocps:project." + IntoCpsApp.getInstance().activeProject.getId()
+        this.projectUri = getActiveProjectUri()
     }
 
     addProjectNode() {
         this.writer.addQuad(
             namedNode(expandWithContext(this.projectUri)),
             namedNode(expandWithContext("type")),
-            namedNode(expandWithContext("prov:Entity"))
+            namedNode(expandWithContext(Prov.ENTITY))
         )
         this.writer.addQuad(
             namedNode(expandWithContext(this.projectUri)),
-            namedNode(expandWithContext("intocps:EntityType")),
-            namedNode(expandWithContext("intocps:Project"))
+            namedNode(expandWithContext(IntocpsPredicate.ENTITYTYPE)),
+            namedNode(expandWithContext(EntityType.PROJECT))
         )
         this.writer.addQuad(
             namedNode(expandWithContext(this.projectUri)),
@@ -46,12 +47,12 @@ export class TraceMessageBuilder {
                 n = node as Activity
                 this.writer.addQuad(
                     namedNode(expandWithContext(n.uri)),
-                    namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                    namedNode("http://www.w3.org/ns/prov#Activity")
+                    namedNode(expandWithContext("type")),
+                    namedNode(expandWithContext(Prov.ACTIVITY))
                 )
                 this.writer.addQuad(
                     namedNode(expandWithContext(n.uri)),
-                    namedNode(expandWithContext("intocps:ActivityType")),
+                    namedNode(expandWithContext(IntocpsPredicate.ACTIVITYTYPE)),
                     namedNode(expandWithContext(n.type))
                 )
                 this.writer.addQuad(
@@ -61,7 +62,7 @@ export class TraceMessageBuilder {
                 )
                 this.writer.addQuad(
                     namedNode(expandWithContext(n.uri)),
-                    namedNode(expandWithContext("intocps:InProject")),
+                    namedNode(expandWithContext(IntocpsPredicate.INPROJECT)),
                     namedNode(expandWithContext(this.projectUri))
                 )
                 if (autoAssociate) {
@@ -69,7 +70,7 @@ export class TraceMessageBuilder {
                     this.addNode(agent)
                     this.writer.addQuad(
                         namedNode(expandWithContext(n.uri)),
-                        namedNode(expandWithContext("prov:wasAssociatedWith")),
+                        namedNode(expandWithContext(Prov.WASASSOCIATEDWITH)),
                         namedNode(agent.uri)
                     )
                 }
@@ -79,8 +80,8 @@ export class TraceMessageBuilder {
                 n = node as Agent
                 this.writer.addQuad(
                     namedNode(expandWithContext(n.uri)),
-                    namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                    namedNode("http://www.w3.org/ns/prov#Agent")
+                    namedNode(expandWithContext("type")),
+                    namedNode(expandWithContext(Prov.AGENT))
                 )
                 this.writer.addQuad(
                     namedNode(expandWithContext(n.uri)),
@@ -98,17 +99,17 @@ export class TraceMessageBuilder {
                 n = node as Artefact
                 this.writer.addQuad(
                     namedNode(expandWithContext(n.uri)),
-                    namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                    namedNode("http://www.w3.org/ns/prov#Entity")
+                    namedNode(expandWithContext("type")),
+                    namedNode(expandWithContext(Prov.ENTITY))
                 )
                 this.writer.addQuad(
                     namedNode(expandWithContext(n.uri)),
-                    namedNode(expandWithContext("intocps:EntityType")),
-                    namedNode(expandWithContext("intocps:Artefact"))
+                    namedNode(expandWithContext(IntocpsPredicate.ENTITYTYPE)),
+                    namedNode(expandWithContext(EntityType.ARTEFACT))
                 )
                 this.writer.addQuad(
                     namedNode(expandWithContext(n.uri)),
-                    namedNode(expandWithContext("intocps:ArtefactType")),
+                    namedNode(expandWithContext(IntocpsPredicate.ARTEFACTTYPE)),
                     namedNode(expandWithContext(n.type))
                 )
                 this.writer.addQuad(
@@ -127,17 +128,17 @@ export class TraceMessageBuilder {
                 n = node as Tool
                 this.writer.addQuad(
                     namedNode(expandWithContext(n.uri)),
-                    namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                    namedNode("http://www.w3.org/ns/prov#Entity")
+                    namedNode(expandWithContext("type")),
+                    namedNode(expandWithContext(Prov.ENTITY))
                 )
                 this.writer.addQuad(
                     namedNode(expandWithContext(n.uri)),
-                    namedNode(expandWithContext("intocps:EntityType")),
-                    namedNode(expandWithContext("intocps:Tool"))
+                    namedNode(expandWithContext(IntocpsPredicate.ENTITYTYPE)),
+                    namedNode(expandWithContext(EntityType.TOOL))
                 )
                 this.writer.addQuad(
                     namedNode(expandWithContext(n.uri)),
-                    namedNode(expandWithContext("intocps:ToolType")),
+                    namedNode(expandWithContext(IntocpsPredicate.TOOLTYPE)),
                     namedNode(expandWithContext(n.type))
                 )
                 this.writer.addQuad(

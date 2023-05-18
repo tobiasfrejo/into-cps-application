@@ -1,19 +1,47 @@
 <div class="sim">
-    <div>
-        <a>{{node.uri}}</a>
-        <p>{{node.type}}</p>
-        <p>{{node.time}}</p>
-    </div>
-    
-    <button type="button" (click)="getFmus()" class="btn btn-default btn-xs">
-        <span class="glyphicon glyphicon-plus"></span>
-    </button>
+    <h3>Simulation overview</h3>
     
     <div *ngIf="loading; then loadblock else displayblock"></div>
     <ng-template #loadblock>Loading...</ng-template>
     <ng-template #displayblock>
-        <div *ngFor="let nd of result">
-            <div>{{nd.uri}}, {{nd.type}}</div>
-        </div>
+        <a>{{node.uri}}</a>
+
+        <table>
+            <tr>
+                <th>Multi Model</th>
+                <td>{{mm_artefact.path.split('/')[2]}}</td>
+                <td><a href="#" (click)="openModel()">open</a></td>
+            </tr>
+            <tr>
+                <th>Co-sim</th>
+                <td>{{sim_artefact.path.split('/')[3]}}</td>
+                <td><a href="#" (click)="openSim()">open</a></td>
+            </tr>
+            <tr>
+                <th>Simulation time</th>
+                <td>{{node.time}}</td>
+            </tr>
+            <tr>
+                <th>Run by</th>
+                <td>{{agent.name}} ({{agent.email}})</td>
+            </tr>
+            <tr>
+                <th>Engine</th>
+                <td>{{engine.name}} v{{engine.version}}</td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                <th>FMU</th>
+                <th>Hash</th>
+            </tr>
+            <tr *ngFor="let fmu of fmus">
+                <td> {{fmu.path}} </td>
+                <td> {{fmu.hash}} </td>
+                <td> <a>get simulations</a> </td>
+                <td> <a>...</a> </td>
+            </tr>
+        </table>
     </ng-template>
 </div>

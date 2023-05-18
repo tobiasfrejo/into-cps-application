@@ -168,9 +168,70 @@ export class TraceabilityController {
         this.client.push(builder)
     }
 
-    createTraceSimulation = () => {
-        // Get FMUs from MM
-        // Get results path
+    createTraceSimulation = (
+        coSimConfig: CoSimulationConfig, 
+        coeInfo: {"name":string, "version":string},
+        resultPath: string
+    ) => {
+        let rootPath = IntoCpsApp.getInstance().getActiveProject().getRootFilePath()
+        let relativeSourcePath = path.relative(rootPath, coSimConfig.sourcePath)
+
+        let builder = new TraceMessageBuilder()
+        builder.addProjectNode()
+
+        let agent = GitConnector.getUserAsAgent()
+        builder.addNode(agent)
+
+        let app = new Tool().intoCpsApp()
+        builder.addNode(app)
+
+        let coe = new Tool().setParameters(
+            "intocps:coSimulationEngine",
+            coeInfo.name,
+            coeInfo.version
+        )
+        builder.addNode(coe)
+
+
+
+        let cosim = new Artefact().coSimConfig(path.relative(rootPath, coSimConfig.sourcePath))
+        builder.addNode(cosim)
+
+        let mm = new Artefact().mmConfig(path.relative(rootPath, coSimConfig.multiModel.sourcePath))
+        builder.addNode(mm)
+
+
+        // Get FMUs in MM
+        let fmuPaths = coSimConfig.multiModel.fmus.map(fmu => fmu.path)
+
+        let fmuUris = fmuPaths.map(fmuPath => {
+            let relativePath = path.relative(rootPath, fmuPath)
+            let fmuNode = new Artefact().fmu(relativePath)
+            builder.addNode(fmuNode)
+            return fmuNode.uri
+        })
+
+        // Get result
+        let result = new Artefact().result(path.relative(rootPath, resultPath))
+        builder.addNode(result)
+
         // Create simulation activity
+        let activity = new Activity().simulation()
+        builder.addNode(activity)
+
+        builder.addTrace(new Trace(activity.uri, "prov:used", app.uri))
+        builder.addTrace(new Trace(activity.uri, "prov:used", coe.uri))
+        builder.addTrace(new Trace(activity.uri, "prov:used", cosim.uri))
+        builder.addTrace(new Trace(activity.uri, "prov:used", mm.uri))
+        builder.addTrace(new Trace(activity.uri, "prov:wasAssociatedWith", agent.uri))
+        fmuUris.forEach(fmuUri => {
+            builder.addTrace(new Trace(activity.uri, "prov:used", fmuUri))
+        })
+
+        builder.addTrace(new Trace(result.uri, "prov:wasGeneratedBy", activity.uri))
+        builder.addTrace(new Trace(result.uri, "prov:wasAttributedTo", agent.uri))
+
+
+        this.client.push(builder)
     }
 }

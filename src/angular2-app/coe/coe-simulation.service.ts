@@ -44,6 +44,7 @@ import DialogHandler from "../../DialogHandler"
 import { Graph } from "../shared/graph"
 import { Deferred } from "../../deferred"
 import { MaestroApiService, simulationEndpoints } from "../shared/maestro-api.service";
+import IntoCpsApp from "../../IntoCpsApp";
 
 
 @Injectable()
@@ -207,6 +208,8 @@ export class CoeSimulationService implements OnDestroy  {
                     // Store the results and run the post processing script
                     storeResultCrc(this._resultPath, this.config);
                     this.executePostProcessingScript(this._resultPath);
+                    // Create simulation trace
+                    IntoCpsApp.getInstance().trController.createTraceSimulation(this.config, {name: "Maestro", version: this.maestroApiService.coeVersionNumber}, this._resultPath)
                 }).catch(err => console.log("Unable to write plain results to file: " + err));
             }).catch((err: Response) => this.errorHandler(err));
         }).finally(() => 

@@ -217,13 +217,12 @@ export class CoeConfigurationComponent {
 			}
 		}
 
-		let prevHash = GitConnector.getFileHash(this.config.sourcePath)
 		if (override) {
 			this.config
 				.saveOverride()
 				.then(() => {
 					this.change.emit(this.path)
-					IntoCpsApp.getInstance().trController.createTraceCoSimConfig(this.config, prevHash)
+					
 				})
 				.catch((error) => console.error("error when overriding save: " + error));
 		} else {
@@ -231,7 +230,6 @@ export class CoeConfigurationComponent {
 				.save()
 				.then(() => {
 					this.change.emit(this.path)
-					IntoCpsApp.getInstance().trController.createTraceCoSimConfig(this.config, prevHash)
 				})
 				.catch((error) => console.error("error when saving: " + error));
 		}

@@ -44,6 +44,7 @@ import * as Path from 'path';
 
 import { checksum } from "../proj/Project";
 import IntoCpsApp from "../IntoCpsApp";
+import { GitConnector } from "../traceability/git-connector";
 
 export class CoSimulationConfig implements ISerializable {
     //project root required to resolve multimodel path
@@ -123,12 +124,14 @@ export class CoSimulationConfig implements ISerializable {
     save(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
-
+                let prevHash = GitConnector.getFileHash(this.sourcePath)
                 fs.writeFile(this.sourcePath, JSON.stringify(this.toObject()), error => {
                     if (error)
                         reject(error);
-                    else
+                    else {
+                        IntoCpsApp.getInstance().trController.createTraceCoSimConfig(this, prevHash)
                         resolve();
+                    }
                 });
             } catch (error) {
                 reject(error);

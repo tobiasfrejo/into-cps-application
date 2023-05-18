@@ -37,6 +37,8 @@ import {
 } from "../angular2-app/coe/models/Fmu";
 import * as Path from 'path';
 import * as fs from 'fs';
+import { GitConnector } from "../traceability/git-connector";
+import IntoCpsApp from "../IntoCpsApp";
 
 // Multi-Model
 
@@ -257,11 +259,14 @@ export class MultiModelConfig implements ISerializable {
             if (messages.length > 0)
                 reject(messages);
 
+            let prevHash = GitConnector.getFileHash(this.sourcePath)
             fs.writeFile(this.sourcePath, JSON.stringify(this.toObject()), error => {
                 if (error)
                     reject(error);
-                else
+                else {
+                    IntoCpsApp.getInstance().trController.createTraceMMConfig(this, prevHash)
                     resolve();
+                }
             });
         });
     }

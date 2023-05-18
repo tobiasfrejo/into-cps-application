@@ -135,13 +135,11 @@ export class MmConfigurationComponent {
         this.warnings = this.config.validate();
 
         if (this.warnings.length > 0) return;
-        let sourceHash = GitConnector.getFileHash(this.config.sourcePath)
         this.config.save()
             .then(() => {
                 this.selectOutputInstance(null);
                 this.selectParameterInstance(null);
                 this.change.emit(this.path);
-                IntoCpsApp.getInstance().trController.createTraceMMConfig(this.config, sourceHash)
             }).catch(error => console.error("Error when submitting changes to mm: " + error));
 
         this.editing = false;

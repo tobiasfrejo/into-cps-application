@@ -89,24 +89,48 @@ coe-configuration .alert-big {
     }
     
 
-    
-.tr-header {
-    background-color: #fafafa;
-    width: 100%;
-    padding: 10pt;
-    margin-bottom: 10pt;
+th, td {
+    padding-right: 1em;
 }
 
-.sim {
-    background-color: #ffeeff;
-    width: calc(100% - 20pt);
-    padding: 10pt;
-    margin: 10pt;
+.grid-table {
+    display: grid;
+    max-width: max-content;
 }
 
-.tr-post-test {
-    background-color: #ddeeff;
-    width: 100%;
-    padding: 10pt;
-    margin-top: 10pt;
+.grid-table-row, .grid-table-headers {
+    display: grid;
+    gap: 8px;
+}
+.grid-table>div::before, .grid-table>div::after {
+    display: none;
+}
+
+.grid-table-headers {
+    font-weight: bold;
+}
+
+.grid-table.sim-list .grid-table-row, 
+.grid-table.sim-list .grid-table-headers {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+
+.expandable:hover {
+    background-color: #EEF4FD;
+}
+
+.expandable .grid-table-row {
+    cursor: pointer;
+}
+
+.expandable .expanded-row-content {
+    background-color: #deefff;
+    display: block;
+    grid-column: 1/-1;
+    padding: 8px;
+}
+
+.expandable .hide-row {
+    display: none;
 }

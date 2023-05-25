@@ -1,33 +1,27 @@
 <div class="sim">
-    <h3>Simulation overview</h3>
-    
-    <div *ngIf="loading; then loadblock else displayblock"></div>
+    <div *ngIf="node; then displayblock else loadblock"></div>
     <ng-template #loadblock>Loading...</ng-template>
     <ng-template #displayblock>
-        <a>{{node.uri}}</a>
-
         <table>
             <tr>
                 <th>Multi Model</th>
-                <td>{{mm_artefact.path.split('/')[2]}}</td>
-                <td><a href="#" (click)="openModel()">open</a></td>
+                <td>{{node.mmConfig.path.split('/')[1]}} <a href="#" (click)="openModel()">(open)</a></td>
             </tr>
             <tr>
                 <th>Co-sim</th>
-                <td>{{sim_artefact.path.split('/')[3]}}</td>
-                <td><a href="#" (click)="openSim()">open</a></td>
+                <td>{{node.simulationConfig.path.split('/')[2]}} <a href="#" (click)="openSim()">(open)</a></td>
             </tr>
             <tr>
                 <th>Simulation time</th>
-                <td>{{node.time}}</td>
+                <td>{{node.simulationActivity.time}}</td>
             </tr>
             <tr>
                 <th>Run by</th>
-                <td>{{agent.name}} ({{agent.email}})</td>
+                <td>{{node.agent.name}} ({{node.agent.email}})</td>
             </tr>
             <tr>
                 <th>Engine</th>
-                <td>{{engine.name}} v{{engine.version}}</td>
+                <td>{{node.engine.name}} v{{node.engine.version}}</td>
             </tr>
         </table>
 
@@ -36,10 +30,10 @@
                 <th>FMU</th>
                 <th>Hash</th>
             </tr>
-            <tr *ngFor="let fmu of fmus">
+            <tr *ngFor="let fmu of node.fmus">
                 <td> {{fmu.path}} </td>
                 <td> {{fmu.hash}} </td>
-                <td> <a>get simulations</a> </td>
+                <td> <a href="#" (click)="listSimulationsWithFmu(fmu.uri)">get simulations</a> </td>
                 <td> <a>...</a> </td>
             </tr>
         </table>

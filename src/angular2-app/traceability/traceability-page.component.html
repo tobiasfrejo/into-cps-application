@@ -1,27 +1,39 @@
-<div>
-    <div class="tr-header">
-        <p>
-            Load simulations
-        </p>
-        
-        <button type="button" (click)="getSimulations()" class="btn btn-default btn-xs">
-            <span class="glyphicon glyphicon-plus"></span>
-        </button>
+<div *ngIf="TrController.enabled; then contentblock else disabledblock"></div>
+<ng-template #disabledblock>
+    <div style="background-color: darkred; color: white; padding: 1em; margin: 1em">
+        <h2>Traceability disabled</h2>
+        <p>Traceability is disabled in the settings. This page can only be used if the feature is enabled.</p>
     </div>
+</ng-template>
 
+<ng-template #contentblock>
     <div *ngIf="loading; then loadblock else displayblock"></div>
     <ng-template #loadblock>Loading...</ng-template>
     <ng-template #displayblock>
-        <div *ngFor="let nd of nodes">
-            <tr-sim [node]="nd"></tr-sim>
+        <div class="grid-table sim-list">
+            <div class="grid-table-headers">
+                <span>Simulation date</span>
+                <span>Multimodel/co-sim</span>
+                <span>Agent</span>
+            </div>
+            <div *ngFor="let sim of simulations" class="expandable">
+                <div class="grid-table-row" onclick="this.parentNode.classList.toggle('selected'); this.parentNode.getElementsByClassName('expanded-row-content')[0].classList.toggle('hide-row');">
+                    <span>{{sim.simulationActivity.time.toISOString()}}</span>
+                    <span>{{sim.mmConfig.path.split('/')[1]}}/{{sim.simulationConfig.path.split('/')[2]}}</span>
+                    <span>{{sim.agent.name}} &lt;{{sim.agent.email}}&gt;</span>
+                </div>
+                <div class="expanded-row-content hide-row">
+                    <tr-sim [node]="sim" (simulationsWithFmu)="getSimulationsWithFmu($event)"></tr-sim>
+                </div>
+            </div>
         </div>
     </ng-template>
 
 
-    <div class="tr-post-test">
+    <!-- <div class="tr-post-test">
         <p>Test post</p>
         <button type="button" (click)="testPost()" class="btn btn-default btn-xs">
             <span class="glyphicon glyphicon-plus"></span>
         </button>
-    </div>
-</div>
+    </div> -->
+</ng-template>

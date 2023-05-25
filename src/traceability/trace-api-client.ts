@@ -221,7 +221,13 @@ class TraceabilityAPIClient {
             [IntocpsPredicate.ACTIVITYTYPE]: ActivityType.SIMULATION
         }
 
-        return this.sendGet("nodes", params)
+        return new Promise<Array<Activity>>((resolve, reject) => {
+            this.sendGet("nodes", params)
+            .then((res: {nodes: Array<TrNode>, traces: Array<Trace>}) => {
+                resolve(res.nodes.map(sim=>sim as Activity))
+            })
+            .catch(reject)
+        })
     }
 
     getFmusInSimulation(simUri: string) {
@@ -232,6 +238,20 @@ class TraceabilityAPIClient {
             .then((res: {nodes: Array<TrNode>, traces: Array<Trace>}) => {
                 let uris = res.traces.map(nd => nd.object)
                 resolve(res.nodes.filter(nd => uris.includes(nd.uri)) as Array<Artefact>)
+            })
+            .catch(reject)
+        })
+    }
+
+    getSimulationsWithFmu(fmuUri: string) {
+        return new Promise<Array<Activity>>((resolve, reject) => {
+            this.sendGet(`traces/${Prov.USED}/to/${fmuUri}`, {
+                "projectId": getActiveProjectUri(),
+                [IntocpsPredicate.ACTIVITYTYPE]: ActivityType.SIMULATION
+            })
+            .then((res: {nodes: Array<TrNode>, traces: Array<Trace>}) => {
+                let uris = res.traces.map(nd => nd.subject)
+                resolve(res.nodes.filter(nd => uris.includes(nd.uri)) as Array<Activity>)
             })
             .catch(reject)
         })

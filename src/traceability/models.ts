@@ -2,6 +2,12 @@ import { GitConnector } from "./git-connector";
 import IntoCpsApp from "../IntoCpsApp";
 import { assert } from "console";
 import { ActivityType, ArtefactType, EntityType, IntocpsPredicate, Prov, ToolType } from "./TraceabilityKeys";
+import { v5 as UUIDv5 } from 'uuid'
+
+function getUrnUuid(name:string) {
+    const ns = UUIDv5("into-cps.org", UUIDv5.DNS)
+    return "urn:uuid:" + UUIDv5(name, ns)
+}
 
 class Trace {
     subject: string
@@ -132,7 +138,7 @@ class Activity extends TrNode {
         this.type = type
         this.time = time
 
-        this.uri = `intocps:Activity.${type.replace(/^intocps:/, '')}.${time.toISOString()}`
+        this.uri = getUrnUuid(`Activity.${type}#${time.toISOString()}`)
 
         return this
     }
@@ -213,7 +219,7 @@ class Artefact extends Entity {
         this.path = path
         this.hash = hash
 
-        this.uri = `intocps:Artefact.${type.replace(/^intocps:/, '')}.${hash}`
+        this.uri = getUrnUuid(`Artefact.${type}#${hash}`)
 
         return this
     }
@@ -282,7 +288,7 @@ class Tool extends Entity {
         this.name = name
         this.version = version
 
-        this.uri = `intocps:Tool.${type.replace(/^intocps:/, '')}.${name.replace(/[^0-9a-zA-Z_\-\.]/g, '_')}_${version}`
+        this.uri = getUrnUuid(`Tool.${type}#${name} ${version}`)
 
         return this
     }
@@ -313,7 +319,7 @@ class Tool extends Entity {
 }
 
 export function getActiveProjectUri() {
-    return "intocps:Project." + IntoCpsApp.getInstance().activeProject.getId()
+    return "urn:uuid:" + IntoCpsApp.getInstance().activeProject.getId()
 }
 
 export {Trace, TrNode, Activity, Agent, Entity, Artefact, Tool}

@@ -42,6 +42,7 @@ import { DseConfiguration } from "../intocps-configurations/dse-configuration"
 import { IntoCpsApp } from "../IntoCpsApp";
 import { SettingKeys } from "../settings/SettingKeys";
 import crypto = require("crypto");
+import { v4 as UUIDv4 } from 'uuid'
 
 export class Project implements IProject {
 
@@ -93,7 +94,8 @@ export class Project implements IProject {
     }
 
     public generateId() {
-        this.projectId = crypto.randomBytes(16).toString('hex')
+        //this.projectId = crypto.randomBytes(16).toString('hex')
+        this.projectId = UUIDv4()
         console.log(`Generated project ID ${this.projectId}`)
     }
 

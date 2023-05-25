@@ -1,18 +1,12 @@
 import * as jsonld from 'jsonld';
 import { TrNode, Trace } from "./models";
+import { prefixes, terms } from './contextHelper';
 
 const default_document: jsonld.JsonLdDocument = 
 {
     "@context": {
-        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-        "prov": "http://www.w3.org/ns/prov#",
-        "intocps": "http://into-cps.org/ns#",
-        "name": "https://schema.org/name",
-        "email": "https://schema.org/email",
-        "hash": "https://schema.org/sha256",
-        "time": "https://schema.org/DateTime",
-        "type": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "path": "http://ns.into-cps.org/Path"
+        ...prefixes,
+        ...terms
     }
 }
 

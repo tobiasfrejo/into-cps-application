@@ -1,11 +1,11 @@
-const terms: {[key: string]: string} = {
+const terms = {
     "name": "https://schema.org/name",
     "email": "https://schema.org/email",
-    "hash": "https://schema.org/sha256",
     "time": "https://schema.org/DateTime",
+    "version": "https://schema.org/version",
     "type": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-    "path": "http://into-cps.org/ns#Path",
-    "version": "http://into-cps.org/ns#Version"
+    "hash": "http://into-cps.org/ns#gitHash",
+    "path": "http://into-cps.org/ns#path",
 }
 const prefixes: {[key: string]: string} = {
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",

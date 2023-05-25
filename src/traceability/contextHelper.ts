@@ -1,4 +1,4 @@
-const terms = {
+const terms: {[key: string]: string} = {
     "name": "https://schema.org/name",
     "email": "https://schema.org/email",
     "time": "https://schema.org/DateTime",

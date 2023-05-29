@@ -2,7 +2,7 @@ import path = require("path");
 import IntoCpsApp from "../IntoCpsApp";
 import { MultiModelConfig } from "../intocps-configurations/MultiModelConfig";
 import { TraceMessageBuilder } from "./TraceMessageBuilder";
-import { Activity, Trace, TrNode, Agent, Tool, Artefact } from "./models";
+import { Activity, Trace, Tool, Artefact } from "./models";
 import { TraceabilityAPIClient } from "./trace-api-client";
 import { GitConnector } from "./git-connector";
 import { CoSimulationConfig } from "../intocps-configurations/CoSimulationConfig";
@@ -11,7 +11,6 @@ import { SettingKeys } from "../settings/SettingKeys";
 
 export class TraceabilityController {
     client: TraceabilityAPIClient
-    receivedData: Object
     enabled: boolean = false
 
     constructor () {
@@ -113,7 +112,7 @@ export class TraceabilityController {
         this.client.push(builder)
     }
 
-    createTraceCoSimConfig = (coSimConfig: CoSimulationConfig, prevHash: string) => {
+    createTraceCoSimConfig = (coSimConfig: CoSimulationConfig, prevHash: string = null) => {
         if (!this.enabled) return
 
         // Do nothing if file is unchanged

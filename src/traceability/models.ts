@@ -9,6 +9,10 @@ function getUrnUuid(name:string) {
     return "urn:uuid:" + UUIDv5(name, ns)
 }
 
+export function getActiveProjectUri() {
+    return "urn:uuid:" + IntoCpsApp.getInstance().activeProject.getId()
+}
+
 class Trace {
     subject: string
     predicate: string
@@ -26,7 +30,6 @@ class TrNode {
 
     uri: string
     specifier: string
-    projectId: string
 
     constructor () {
         this.className = "TrNode"
@@ -65,19 +68,8 @@ class TrNode {
         return this
     }
 
-    setProjectId(id: string = null) {
-        if (id === null)
-            this.projectId = IntoCpsApp.getInstance().activeProject.getId()
-        else
-            this.projectId = id
-        
-        return this
-    }
-
     getParameters() {
-        let p: {[key: string]: string} = {
-            projectId: this.projectId
-        }
+        let p: {[key: string]: string} = {}
         return p
     }
 }
@@ -316,10 +308,6 @@ class Tool extends Entity {
             )
                 
     }
-}
-
-export function getActiveProjectUri() {
-    return "urn:uuid:" + IntoCpsApp.getInstance().activeProject.getId()
 }
 
 export {Trace, TrNode, Activity, Agent, Entity, Artefact, Tool}

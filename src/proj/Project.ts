@@ -41,7 +41,6 @@ import { ProjectSettings } from "./ProjectSettings"
 import { DseConfiguration } from "../intocps-configurations/dse-configuration"
 import { IntoCpsApp } from "../IntoCpsApp";
 import { SettingKeys } from "../settings/SettingKeys";
-import crypto = require("crypto");
 import { v4 as UUIDv4 } from 'uuid'
 
 export class Project implements IProject {

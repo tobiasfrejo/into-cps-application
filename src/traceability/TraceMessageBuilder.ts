@@ -168,7 +168,7 @@ export class TraceMessageBuilder {
     }
 
 
-    writerEnd = (callback: (jsonldObject: Object) => Promise<void>, localSave:Boolean=true) => {
+    writerEnd = (callback: (jsonldObject: Object) => Promise<void>, localSave:Boolean=false) => {
         return new Promise((resolve, reject) => {
             this.writer.end(async (error, result) => {
                 if (error) {

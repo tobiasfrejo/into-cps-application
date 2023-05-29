@@ -1,7 +1,6 @@
 import {IntoCpsApp} from './../IntoCpsApp';
 import { execSync } from 'child_process';
 import { Agent } from './models';
-import * as fs from 'fs'
 import * as path from 'path'
 import { pathExistsSync } from 'fs-extra';
 

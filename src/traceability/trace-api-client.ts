@@ -2,18 +2,14 @@ import * as http from 'http'
 import * as https from'https'
 import { Activity, Agent, Artefact, TrNode, Trace, getActiveProjectUri } from './models';
 
-import { Readable, Stream } from 'stream';
+import { Readable } from 'stream';
 import { Tool } from './models';
 
 import * as jsonld from 'jsonld'
 import * as N3 from 'n3'
-import { DataFactory } from 'n3';
-import IntoCpsApp from '../IntoCpsApp';
-import  { terms, prefixes, applyContext, expandWithContext } from './contextHelper'
+import { applyContext } from './contextHelper'
 import { TraceMessageBuilder } from './TraceMessageBuilder';
 import { ActivityType, ArtefactType, IntocpsPredicate, Prov, ToolType } from './TraceabilityKeys';
-
-const { namedNode, literal, quad } = DataFactory
 
 // Return the corresponding module based on URL
 let httpX = (url:URL) => {
@@ -55,10 +51,12 @@ class TraceabilityAPIClient {
 
     sendPost = (path:string, data:object) => {
         let url = new URL(path, this.baseUrl)
+        let data_str = JSON.stringify(data, null, 2)
         let options = {
             headers: {
                 "Accept": "application/ld+json, application/json",
-                "Content-Type": "application/ld+json"
+                "Content-Type": "application/ld+json",
+                "Content-Length": data_str.length.toString()
             },
             method: "POST"
         }
@@ -69,7 +67,7 @@ class TraceabilityAPIClient {
                 .on('error', e => {
                     reject(e)
                 });
-            req.write(JSON.stringify(data));
+            req.write(data_str);
             req.end();
         })
     }

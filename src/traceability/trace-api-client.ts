@@ -29,7 +29,8 @@ class TraceabilityAPIClient {
         let url = new URL(path, this.baseUrl)
         let options = {
             headers: {
-                "Accept": "application/ld+json, application/json"
+                'OSLC-Core-Version': '3.0',
+                "Accept": "application/ld+json, application/json",
             }
         }
 
@@ -54,6 +55,7 @@ class TraceabilityAPIClient {
         let data_str = JSON.stringify(data, null, 2)
         let options = {
             headers: {
+                'OSLC-Core-Version': '3.0',
                 "Accept": "application/ld+json, application/json",
                 "Content-Type": "application/ld+json",
                 "Content-Length": data_str.length.toString()

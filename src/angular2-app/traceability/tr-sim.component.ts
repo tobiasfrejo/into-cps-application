@@ -24,12 +24,6 @@ export class TrSimulationComponent {
 
     @Output() simulationsWithFmu = new EventEmitter<string>();
 
-    TrController: TraceabilityController
-
-    constructor () {
-        this.TrController = IntoCpsApp.getInstance().trController
-    }
-
     openModel() {
         IntoCpsAppMenuHandler.getInstance().openMultiModel(
             path.resolve(

@@ -211,7 +211,7 @@ class Artefact extends Entity {
         this.path = path
         this.hash = hash
 
-        this.uri = getUrnUuid(`Artefact.${type}#${hash}`)
+        this.uri = "urn:sha1:" + this.hash
 
         return this
     }

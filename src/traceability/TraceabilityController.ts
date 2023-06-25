@@ -110,6 +110,8 @@ export class TraceabilityController {
         }
 
         this.client.push(builder)
+
+        GitConnector.commitFile(multiModelConfig.sourcePath)
     }
 
     createTraceCoSimConfig = (coSimConfig: CoSimulationConfig, prevHash: string = null) => {
@@ -186,6 +188,8 @@ export class TraceabilityController {
         }
 
         this.client.push(builder)
+        
+        GitConnector.commitFile(coSimConfig.sourcePath)
     }
 
     createTraceSimulation = (
@@ -255,5 +259,7 @@ export class TraceabilityController {
 
 
         this.client.push(builder)
+        
+        GitConnector.commitFile(resultPath)
     }
 }

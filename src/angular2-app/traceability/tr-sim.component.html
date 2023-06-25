@@ -5,11 +5,11 @@
         <table>
             <tr>
                 <th>Multi Model</th>
-                <td>{{node.mmConfig.path.split('/')[1]}} <a href="#" (click)="openModel()">(open)</a></td>
+                <td>{{node.mmConfig.path.split('/')[1]}} #{{node.mmConfig.hash}} <a href="#" (click)="openModel()">(open)</a></td>
             </tr>
             <tr>
                 <th>Co-sim</th>
-                <td>{{node.simulationConfig.path.split('/')[2]}} <a href="#" (click)="openSim()">(open)</a></td>
+                <td>{{node.simulationConfig.path.split('/')[2]}} #{{node.simulationConfig.hash}} <a href="#" (click)="openSim()">(open)</a></td>
             </tr>
             <tr>
                 <th>Simulation time</th>

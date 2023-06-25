@@ -15,7 +15,10 @@ class GitUser {
 
 class GitConnector {
     static execProjectCmd = (cmd: string) => {
-        return execSync(cmd, {cwd: IntoCpsApp.getInstance().getActiveProject().getRootFilePath()})
+        console.log(`Running command: ${cmd}`)
+        let s = execSync(cmd, {cwd: IntoCpsApp.getInstance().getActiveProject().getRootFilePath()})
+        console.log(`Output: ${s.toString().trim()}`)
+        return s
     }
 
     static getUserData = () => {
@@ -34,6 +37,23 @@ class GitConnector {
             GitConnector.execProjectCmd("git add .")
             GitConnector.execProjectCmd('git commit -c "Initialized project git"')
         }
+    }
+
+    static commitFile = (path: string, message="Traceability Auto-commit") => {
+        console.log(`Committing file '${path}'`)
+        try {
+            GitConnector.execProjectCmd(`git add "${path}"`)
+            GitConnector.execProjectCmd(`git commit --no-gpg-sign -m "${message}"`)
+        } catch (error) {
+            console.error(error)
+            return false
+        }
+
+        return true
+    }
+
+    static retrievePastVersion = (fileHash:string)  => {
+        return GitConnector.execProjectCmd(`git show ${fileHash}`).toString()
     }
 
     static getUserAsAgent = () => {
